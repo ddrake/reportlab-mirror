@@ -1,8 +1,9 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-#history https://hg.reportlab.com/hg-public/reportlab/log/tip/src/reportlab/pdfgen/pdfimages.py
-__version__='3.3.0'
-__doc__="""
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+# history https://hg.reportlab.com/hg-public/reportlab/log/tip/src
+#                                 /reportlab/pdfgen/pdfimages.py
+__version__ = '3.3.0'
+"""
 Image functionality sliced out of canvas.py for generalization
 """
 
@@ -22,7 +23,7 @@ class PDFImage:
     an image we previously cached (optimisation, hardly used these
     days) or a JPEG (which PDF supports natively)."""
 
-    def __init__(self, image, x,y, width=None, height=None, caching=0):
+    def __init__(self, image, x, y, width=None, height=None, caching=0):
         self.image = image
         self.x = x
         self.y = y
@@ -36,12 +37,12 @@ class PDFImage:
         self.colorSpace = 'DeviceRGB'
         self.bitsPerComponent = 8
         self.filters = []
-        self.source = None # JPEG or PIL, set later
+        self.source = None  # JPEG or PIL, set later
         self.getImageData()
 
     def jpg_imagedata(self):
-        #directly process JPEG files
-        #open file, needs some error handling!!
+        # directly process JPEG files
+        # open file, needs some error handling!!
         fp = open(self.image, 'rb')
         try:
             result = self._jpg_imagedata(fp)
@@ -49,7 +50,7 @@ class PDFImage:
             fp.close()
         return result
 
-    def _jpg_imagedata(self,imageFile):
+    def _jpg_imagedata(self, imageFile):
         info = pdfutils.readJPEGInfo(imageFile)
         self.source = 'JPEG'
         imgwidth, imgheight = info[0], info[1]
@@ -57,17 +58,22 @@ class PDFImage:
             colorSpace = 'DeviceGray'
         elif info[2] == 3:
             colorSpace = 'DeviceRGB'
-        else: #maybe should generate an error, is this right for CMYK?
+        else:  # maybe should generate an error, is this right for CMYK?
             colorSpace = 'DeviceCMYK'
-        imageFile.seek(0) #reset file pointer
+        imageFile.seek(0)  # reset file pointer
         imagedata = []
-        #imagedata.append('BI /Width %d /Height /BitsPerComponent 8 /ColorSpace /%s /Filter [/Filter [ /ASCII85Decode /DCTDecode] ID' % (info[0], info[1], colorSpace))
-        imagedata.append('BI /W %d /H %d /BPC 8 /CS /%s /F [%s/DCT] ID' % (imgwidth, imgheight, colorSpace, rl_config.useA85 and '/A85 ' or ''))
-        #write in blocks of (??) 60 characters per line to a list
+        # imagedata.append(
+        #     ('BI /Width %d /Height /BitsPerComponent 8 /ColorSpace /%s ' +
+        #      '/Filter [/Filter [ /ASCII85Decode /DCTDecode] ID') %
+        #     (info[0], info[1], colorSpace))
+        imagedata.append('BI /W %d /H %d /BPC 8 /CS /%s /F [%s/DCT] ID' %
+                         (imgwidth, imgheight, colorSpace,
+                          rl_config.useA85 and '/A85 ' or ''))
+        # write in blocks of (??) 60 characters per line to a list
         data = imageFile.read()
         if rl_config.useA85:
             data = asciiBase85Encode(data)
-        pdfutils._chunker(data,imagedata)
+        pdfutils._chunker(data, imagedata)
         imagedata.append('EI')
         return (imagedata, imgwidth, imgheight)
 
@@ -76,18 +82,19 @@ class PDFImage:
         if not pdfutils.cachedImageExists(image):
             pdfutils.cacheImageFile(image)
 
-        #now we have one cached, slurp it in
-        cachedname = os.path.splitext(image)[0] + (rl_config.useA85 and '.a85' or '.bin')
-        imagedata = open(cachedname,'rb').readlines()
-        #trim off newlines...
+        # now we have one cached, slurp it in
+        cachedname = (os.path.splitext(image)[0] +
+                      (rl_config.useA85 and '.a85' or '.bin'))
+        imagedata = open(cachedname, 'rb').readlines()
+        # trim off newlines...
         imagedata = list(map(str.strip, imagedata))
         return imagedata
 
     def PIL_imagedata(self):
         import zlib
         image = self.image
-        if image.format=='JPEG':
-            fp=image.fp
+        if image.format == 'JPEG':
+            fp = image.fp
             fp.seek(0)
             return self._jpg_imagedata(fp)
         self.source = 'PIL'
@@ -115,23 +122,25 @@ class PDFImage:
 
         # this describes what is in the image itself
         # *NB* according to the spec you can only use the short form in inline images
-        imagedata=['BI /W %d /H %d /BPC %d /CS /%s /F [%s/Fl] ID' % (imgwidth, imgheight, bpc, colorSpace, rl_config.useA85 and '/A85 ' or '')]
+        imagedata = ['BI /W %d /H %d /BPC %d /CS /%s /F [%s/Fl] ID' %
+                     (imgwidth, imgheight, bpc, colorSpace,
+                      rl_config.useA85 and '/A85 ' or '')]
 
-        #use a flate filter and, optionally, Ascii Base 85 to compress
-        raw = (myimage.tobytes if hasattr(myimage,'tobytes') else myimage.tostring)()
-        rowstride = (imgwidth*bpc*bpp+7)>>3
+        # use a flate filter and, optionally, Ascii Base 85 to compress
+        raw = (myimage.tobytes if hasattr(myimage, 'tobytes') else myimage.tostring)()
+        rowstride = (imgwidth*bpc*bpp+7) >> 3
         assert len(raw) == rowstride*imgheight, "Wrong amount of data for image"
-        data = zlib.compress(raw)    #this bit is very fast...
+        data = zlib.compress(raw)    # this bit is very fast...
         if rl_config.useA85:
-            data = asciiBase85Encode(data) #...sadly this may not be
-        #append in blocks of 60 characters
-        pdfutils._chunker(data,imagedata)
+            data = asciiBase85Encode(data)  # ...sadly this may not be
+        # append in blocks of 60 characters
+        pdfutils._chunker(data, imagedata)
         imagedata.append('EI')
         return (imagedata, imgwidth, imgheight)
 
-    def non_jpg_imagedata(self,image):
+    def non_jpg_imagedata(self, image):
         if not self.imageCaching:
-            imagedata = pdfutils.cacheImageFile(image,returnInMemory=1)
+            imagedata = pdfutils.cacheImageFile(image, returnInMemory=1)
         else:
             imagedata = self.cache_imagedata()
         words = imagedata[1].split()
@@ -139,7 +148,7 @@ class PDFImage:
         imgheight = int(words[3])
         return imagedata, imgwidth, imgheight
 
-    def getImageData(self,preserveAspectRatio=False):
+    def getImageData(self, preserveAspectRatio=False):
         "Gets data, height, width - whatever type of image"
         image = self.image
 
@@ -148,8 +157,9 @@ class PDFImage:
             if os.path.splitext(image)[1] in ['.jpg', '.JPG', '.jpeg', '.JPEG']:
                 try:
                     imagedata, imgwidth, imgheight = self.jpg_imagedata()
-                except:
-                    imagedata, imgwidth, imgheight = self.non_jpg_imagedata(image)  #try for normal kind of image
+                except Exception:
+                    # try for normal kind of image
+                    imagedata, imgwidth, imgheight = self.non_jpg_imagedata(image)
             else:
                 imagedata, imgwidth, imgheight = self.non_jpg_imagedata(image)
         else:
@@ -160,19 +170,24 @@ class PDFImage:
         self.width = self.width or imgwidth
         self.height = self.height or imgheight
 
-    def drawInlineImage(self, canvas, preserveAspectRatio=False,anchor='sw', anchorAtXY=False,
-                     showBoundary=False, extraReturn=None):
+    def drawInlineImage(self, canvas, preserveAspectRatio=False, anchor='sw',
+                        anchorAtXY=False, showBoundary=False, extraReturn=None):
         """Draw an Image into the specified rectangle.  If width and
         height are omitted, they are calculated from the image size.
         Also allow file names as well as images.  This allows a
         caching mechanism"""
         width = self.width
         height = self.height
-        if width<1e-6 or height<1e-6: return False
-        x,y,self.width,self.height, scaled = aspectRatioFix(preserveAspectRatio,anchor,self.x,self.y,width,height,self.imgwidth,self.imgheight,anchorAtXY)
+        if width < 1e-6 or height < 1e-6:
+            return False
+        x, y, self.width, self.height, scaled = aspectRatioFix(
+            preserveAspectRatio, anchor, self.x, self.y, width, height, self.imgwidth,
+            self.imgheight, anchorAtXY)
         # this says where and how big to draw it
-        if not canvas.bottomup: y = y+height
-        canvas._code.append('q %s 0 0 %s cm' % (fp_str(self.width), fp_str(self.height, x, y)))
+        if not canvas.bottomup:
+            y = y+height
+        canvas._code.append('q %s 0 0 %s cm' %
+                            (fp_str(self.width), fp_str(self.height, x, y)))
         width = self.width
         height = self.height
         # self._code.extend(imagedata) if >=python-1.5.2
@@ -180,7 +195,7 @@ class PDFImage:
             canvas._code.append(line)
         canvas._code.append('Q')
         if showBoundary:
-            canvas.drawBoundary(showBoundary,x,y,width,height)
+            canvas.drawBoundary(showBoundary, x, y, width, height)
         if extraReturn:
             for k in extraReturn.keys():
                 extraReturn[k] = vars()[k]
@@ -201,7 +216,8 @@ class PDFImage:
         strm = pdfdoc.PDFStream(dictionary=dict, content=content)
         return strm.format(document)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     srcfile = os.path.join(
                 os.path.dirname(reportlab.__file__),
                 'test',
@@ -211,5 +227,5 @@ if __name__=='__main__':
     pdfdoc.LongFormat = 1
     img = PDFImage(srcfile, 100, 100)
     doc = pdfdoc.PDFDocument()
-    print('source=',img.source)
+    print('source=', img.source)
     print(img.format(doc))
