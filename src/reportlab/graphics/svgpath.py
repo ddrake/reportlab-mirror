@@ -1,8 +1,11 @@
-'''this code is derived from that used by svglib.''' 
-__all__=('SvgPath',)
-import re, copy
+'''this code is derived from that used by svglib.'''
+__all__ = ('SvgPath',)
+import re
+import copy
 from math import acos, ceil, copysign, cos, degrees, fabs, hypot, radians, sin, sqrt
-from .shapes import Group, mmult, rotate, translate, transformPoint, Path, FILL_EVEN_ODD, _CLOSEPATH, UserNode
+from .shapes import (Group, mmult, rotate, translate, transformPoint, Path,
+                     FILL_EVEN_ODD, _CLOSEPATH, UserNode)
+
 
 def split_floats(op, min_num, value):
     """Split `value`, a list of numbers as a string, to a list of float numbers.
@@ -12,13 +15,15 @@ def split_floats(op, min_num, value):
     Example: with op='m' and value='10,20 30,40,' the returned value will be
              ['m', [10.0, 20.0], 'l', [30.0, 40.0]]
     """
-    floats = [float(seq) for seq in re.findall(r'(-?\d*\.?\d*(?:[eE][+-]?\d+)?)', value) if seq]
+    floats = [float(seq) for seq in re.findall(r'(-?\d*\.?\d*(?:[eE][+-]?\d+)?)',
+                                               value) if seq]
     res = []
     for i in range(0, len(floats), min_num):
         if i > 0 and op in {'m', 'M'}:
             op = 'l' if op == 'm' else 'L'
         res.extend([op, floats[i:i + min_num]])
     return res
+
 
 def split_arc_values(op, value):
     float_re = r'(-?\d*\.?\d*(?:[eE][+-]?\d+)?)'
@@ -31,6 +36,7 @@ def split_arc_values(op, value):
     for seq in re.finditer(a_seq_re, value.strip()):
         res.extend([op, [float(num) for num in seq.groups()]])
     return res
+
 
 def normalise_svg_path(attr):
     """Normalise SVG path.
@@ -81,6 +87,7 @@ def normalise_svg_path(attr):
 
     return result
 
+
 def convert_quadratic_to_cubic_path(q0, q1, q2):
     """
     Convert a quadratic Bezier curve through q0, q1, q2 to a cubic one.
@@ -90,6 +97,7 @@ def convert_quadratic_to_cubic_path(q0, q1, q2):
     c2 = (c1[0] + 1 / 3 * (q2[0] - q0[0]), c1[1] + 1 / 3 * (q2[1] - q0[1]))
     c3 = q2
     return c0, c1, c2, c3
+
 
 # ***********************************************
 # Helper functions for elliptical arc conversion.
@@ -105,6 +113,7 @@ def vector_angle(u, v):
         c = 1
     s = u[0] * v[1] - u[1] * v[0]
     return degrees(copysign(acos(c), s))
+
 
 def end_point_to_center_parameters(x1, y1, x2, y2, fA, fS, rx, ry, phi=0):
     '''
@@ -184,6 +193,7 @@ def end_point_to_center_parameters(x1, y1, x2, y2, fA, fS, rx, ry, phi=0):
         dtheta += 360
     return cx, cy, rx, ry, -theta1, -dtheta
 
+
 def bezier_arc_from_centre(cx, cy, rx, ry, start_ang=0, extent=90):
     if abs(extent) <= 90:
         nfrag = 1
@@ -223,6 +233,7 @@ def bezier_arc_from_centre(cx, cy, rx, ry, start_ang=0, extent=90):
                           cy - ry * s1))
     return point_list
 
+
 def bezier_arc_from_end_points(x1, y1, rx, ry, phi, fA, fS, x2, y2):
     if (x1 == x2 and y1 == y2):
         # From https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes:
@@ -254,17 +265,19 @@ def bezier_arc_from_end_points(x1, y1, rx, ry, phi, fA, fS, x2, y2):
         )
         return bezier_arc_from_centre(cx, cy, rx, ry, start_ang, extent)
 
-class SvgPath(Path,UserNode):
+
+class SvgPath(Path, UserNode):
     """Path, from an svg path string"""
     def __init__(self, s, isClipPath=0, autoclose=None, fillMode=FILL_EVEN_ODD, **kw):
-        vswap = kw.pop('vswap',0)
-        hswap = kw.pop('hswap',0)
+        vswap = kw.pop('vswap', 0)
+        hswap = kw.pop('hswap', 0)
         super().__init__(
-                        points=None,operators=None,
+                        points=None, operators=None,
                         isClipPath=isClipPath,
                         autoclose=autoclose,
                         fillMode=fillMode, **kw)
-        if not s: return
+        if not s:
+            return
         normPath = normalise_svg_path(s)
         points = self.points
         # Track subpaths needing to be closed later
@@ -405,7 +418,8 @@ class SvgPath(Path,UserNode):
                 self.closePath()
 
             else:
-                logger.debug("Suspicious self operator: %s", op)
+                # bug? undefined name logger
+                logger.debug("Suspicious self operator: %s", op) # noqa
 
             if op not in ('Q', 'q', 'T', 't'):
                 last_quadratic_cp = None
@@ -418,11 +432,11 @@ class SvgPath(Path,UserNode):
             b = self.getBounds()
             if hswap:
                 m = b[2]+b[0]
-                for i in range(0,len(points),2):
+                for i in range(0, len(points), 2):
                     points[i] = m - points[i]
             if vswap:
                 m = b[3]+b[1]
-                for i in range(1,len(points),2):
+                for i in range(1, len(points), 2):
                     points[i] = m - points[i]
 
         if unclosed_subpath_pointers and self.fillColor is not None:
