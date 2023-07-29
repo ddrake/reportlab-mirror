@@ -1,10 +1,20 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+import sys
+import os
+import fnmatch
+import re
+import functools
+from configparser import ConfigParser
+import unittest
+from reportlab.lib.utils import isCompactDistro, __rl_loader__, rl_isdir, asUnicode
+
 import reportlab
-reportlab._rl_testing=True
+reportlab._rl_testing = True
 del reportlab
-__version__='4.0.1'
-__doc__="""Provides support for the test suite.
+
+__version__ = '4.0.1'
+"""Provides support for the test suite.
 
 The test suite as a whole, and individual tests, need to share
 certain support functions.  We have to put these in here so they
@@ -12,10 +22,6 @@ can always be imported, and so that individual tests need to import
 nothing more than "reportlab.whatever..."
 """
 
-import sys, os, fnmatch, re, functools
-from configparser import ConfigParser
-import unittest
-from reportlab.lib.utils import isCompactDistro, __rl_loader__, rl_isdir, asUnicode
 
 def haveRenderPM():
     from reportlab.graphics.renderPM import _getPMBackend, RenderPMError
@@ -23,6 +29,7 @@ def haveRenderPM():
         return _getPMBackend()
     except RenderPMError:
         return False
+
 
 # Helper functions.
 def isWritable(D):
@@ -34,70 +41,83 @@ def isWritable(D):
         if os.path.isfile(fn):
             os.remove(fn)
             return 1
-    except:
+    except Exception:
         return 0
+
 
 _OUTDIR = None
 RL_HOME = None
 testsFolder = None
+
+
 def setOutDir(name):
     """Is it a writable file system distro being invoked within
     test directory?  If so, can write test output here.  If not,
     it had better go in a temp directory.  Only do this once per
     process"""
     global _OUTDIR, RL_HOME, testsFolder
-    if _OUTDIR: return _OUTDIR
+    if _OUTDIR:
+        return _OUTDIR
     D = [d[9:] for d in sys.argv if d.startswith('--outdir=')]
     if not D:
-        D = os.environ.get('RL_TEST_OUTDIR','')
-        if D: D=[D]
+        D = os.environ.get('RL_TEST_OUTDIR', '')
+        if D:
+            D = [D]
     if D:
         _OUTDIR = D[-1]
         try:
             os.makedirs(_OUTDIR)
-        except:
+        except Exception:
             pass
         for d in D:
             if d in sys.argv:
                 sys.argv.remove(d)
     else:
-        assert name=='__main__',"setOutDir should only be called in the main script"
-        scriptDir=os.path.dirname(sys.argv[0])
-        if not scriptDir: scriptDir=os.getcwd()
+        assert name == '__main__', "setOutDir should only be called in the main script"
+        scriptDir = os.path.dirname(sys.argv[0])
+        if not scriptDir:
+            scriptDir = os.getcwd()
         _OUTDIR = scriptDir
 
     if not isWritable(_OUTDIR):
-        _OUTDIR = get_rl_tempdir('reportlab_test')
+        # bug? undefined name get_rl_tempdir
+        _OUTDIR = get_rl_tempdir('reportlab_test')  # noqa
 
     import reportlab
-    RL_HOME=reportlab.__path__[0]
-    if not os.path.isabs(RL_HOME): RL_HOME=os.path.normpath(os.path.abspath(RL_HOME))
+    RL_HOME = reportlab.__path__[0]
+    if not os.path.isabs(RL_HOME):
+        RL_HOME = os.path.normpath(os.path.abspath(RL_HOME))
     topDir = os.path.dirname(RL_HOME)
-    testsFolder = os.path.join(topDir,'tests')
+    testsFolder = os.path.join(topDir, 'tests')
     if not os.path.isdir(testsFolder):
-        testsFolder = os.path.join(os.path.dirname(topDir),'tests')
+        testsFolder = os.path.join(os.path.dirname(topDir), 'tests')
     if not os.path.isdir(testsFolder):
-        if name=='__main__':
-            scriptDir=os.path.dirname(sys.argv[0])
-            if not scriptDir: scriptDir=os.getcwd()
+        if name == '__main__':
+            scriptDir = os.path.dirname(sys.argv[0])
+            if not scriptDir:
+                scriptDir = os.getcwd()
             testsFolder = os.path.abspath(scriptDir)
         else:
             testsFolder = None
     if testsFolder:
-        sys.path.insert(0,os.path.dirname(testsFolder))
+        sys.path.insert(0, os.path.dirname(testsFolder))
     return _OUTDIR
 
+
 _mockumap = (
-        None if os.environ.get('OFFLINE_MOCK','1')!='1' 
-            else'http://www.reportlab.com/rsrc/encryption.gif',
+        None if os.environ.get('OFFLINE_MOCK', '1') != '1' else
+        'http://www.reportlab.com/rsrc/encryption.gif',
         )
+
+
 def mockUrlRead(name):
     if name in _mockumap:
-        with open(os.path.join(testsFolder,os.path.basename(name)),'rb') as f:
+        with open(os.path.join(testsFolder, os.path.basename(name)), 'rb') as f:
             return f.read()
     else:
         from urllib.request import urlopen
         return urlopen(name).read()
+
 
 def outputfile(fn):
     """This works out where to write test output.  If running
@@ -106,14 +126,17 @@ def outputfile(fn):
     normally be a file called 'test_foo.pdf', next door.
     """
     D = setOutDir(__name__)
-    if fn: D = os.path.join(D,fn)
+    if fn:
+        D = os.path.join(D, fn)
     return D
 
+
 def printLocation(depth=1):
-    if sys._getframe(depth).f_locals.get('__name__')=='__main__':
+    if sys._getframe(depth).f_locals.get('__name__') == '__main__':
         outDir = outputfile('')
-        if outDir!=_OUTDIR:
+        if outDir != _OUTDIR:
             print('Logs and output files written to folder "%s"' % outDir)
+
 
 def makeSuiteForClasses(*classes):
     "Return a test suite with tests loaded from provided classes."
@@ -123,6 +146,7 @@ def makeSuiteForClasses(*classes):
     for C in classes:
         suite.addTest(loader.loadTestsFromTestCase(C))
     return suite
+
 
 def getCVSEntries(folder, files=1, folders=0):
     """Returns a list of filenames as listed in the CVS/Entries file.
@@ -169,7 +193,7 @@ class ExtConfigParser(ConfigParser):
         val = value.replace('\n', '')
 
         if self.pat.match(val):
-            return eval(val,{__builtins__:None})
+            return eval(val, {__builtins__: None})
         else:
             return value
 
@@ -183,7 +207,7 @@ class GlobDirectoryWalker:
     def __init__(self, directory, pattern='*'):
         self.index = 0
         self.pattern = pattern
-        directory.replace('/',os.sep)
+        directory.replace('/', os.sep)
         if os.path.isdir(directory):
             self.stack = [directory]
             self.files = []
@@ -193,7 +217,12 @@ class GlobDirectoryWalker:
             self.directory = directory[len(__rl_loader__.archive)+len(os.sep):]
             pfx = self.directory+os.sep
             n = len(pfx)
-            self.files = list(map(lambda x, n=n: x[n:],list(filter(lambda x,pfx=pfx: x.startswith(pfx),list(__rl_loader__._files.keys())))))
+            self.files = list(map(lambda x, n=n: x[n:],
+                                  list(filter(lambda x, pfx=pfx: x.startswith(pfx),
+                                              list(__rl_loader__._files.keys())))))
+            # possible improvement (not tested) dd
+            # self.files = [x[n:] for x in __rl_loader__._files.keys()
+            #               if x.startswith(pfx)]
             self.files.sort()
             self.stack = []
 
@@ -229,25 +258,25 @@ class RestrictedGlobDirectoryWalker(GlobDirectoryWalker):
     def __init__(self, directory, pattern='*', ignore=None):
         GlobDirectoryWalker.__init__(self, directory, pattern)
 
-        if ignore == None:
+        if ignore is None:
             ignore = []
         ip = [].append
-        if isinstance(ignore,(tuple,list)):
+        if isinstance(ignore, (tuple, list)):
             for p in ignore:
                 ip(p)
-        elif isinstance(ignore,str):
+        elif isinstance(ignore, str):
             ip(ignore)
-        self.ignorePatterns = ([_.replace('/',os.sep) for _ in ip.__self__] if os.sep != '/'
-                                else ip.__self__)
+        self.ignorePatterns = ([_.replace('/', os.sep) for _ in ip.__self__]
+                               if os.sep != '/' else ip.__self__)
 
     def filterFiles(self, folder, files):
         "Filters all items from files matching patterns to ignore."
 
         fnm = fnmatch.fnmatch
         indicesToDelete = []
-        for i,f in enumerate(files):
+        for i, f in enumerate(files):
             for p in self.ignorePatterns:
-                if fnm(f, p) or fnm(os.path.join(folder,f),p):
+                if fnm(f, p) or fnm(os.path.join(folder, f), p):
                     indicesToDelete.append(i)
         indicesToDelete.reverse()
         for i in indicesToDelete:
@@ -309,16 +338,18 @@ class SecureTestCase(unittest.TestCase):
         sys.path = self._initialPath
         os.chdir(self._initialWorkDir)
 
+
 class NearTestCase(unittest.TestCase):
-    def assertNear(a,b,accuracy=1e-5):
-        if isinstance(a,(float,int)):
-            if abs(a-b)>accuracy:
+    def assertNear(a, b, accuracy=1e-5):
+        if isinstance(a, (float, int)):
+            if abs(a-b) > accuracy:
                 raise AssertionError("%s not near %s" % (a, b))
         else:
-            for ae,be in zip(a,b):
-                if abs(ae-be)>accuracy:
+            for ae, be in zip(a, b):
+                if abs(ae-be) > accuracy:
                     raise AssertionError("%s not near %s" % (a, b))
     assertNear = staticmethod(assertNear)
+
 
 class ScriptThatMakesFileTest(unittest.TestCase):
     """Runs a Python script at OS level, expecting it to produce a file.
@@ -335,9 +366,9 @@ class ScriptThatMakesFileTest(unittest.TestCase):
     def setUp(self):
         self.cwd = os.getcwd()
         global testsFolder
-        scriptDir=self.scriptDir
+        scriptDir = self.scriptDir
         if not os.path.isabs(scriptDir):
-            scriptDir=os.path.join(testsFolder,scriptDir)
+            scriptDir = os.path.join(testsFolder, scriptDir)
 
         os.chdir(scriptDir)
         assert os.path.isfile(self.scriptName), "Script %s not found!" % self.scriptName
@@ -348,43 +379,50 @@ class ScriptThatMakesFileTest(unittest.TestCase):
         os.chdir(self.cwd)
 
     def runTest(self):
-        fmt = sys.platform=='win32' and '"%s" %s' or '%s %s'
+        # fmt = sys.platform == 'win32' and '"%s" %s' or '%s %s' (assigned but not used)
         import subprocess
-        out = subprocess.check_output((sys.executable,self.scriptName))
-        #p = os.popen(fmt % (sys.executable,self.scriptName),'r')
-        #out = p.read()
+        out = subprocess.check_output((sys.executable, self.scriptName))
+        # p = os.popen(fmt % (sys.executable,self.scriptName),'r')
+        # out = p.read()
         if self.verbose:
             print(out)
-        #status = p.close()
-        assert os.path.isfile(self.outFileName), "File %s not created!" % self.outFileName
+        # status = p.close()
+        assert os.path.isfile(self.outFileName), "File %s not created!" % (
+            self.outFileName)
 
-def equalStrings(a,b,enc='utf8'):
-    return a==b if type(a)==type(b) else asUnicode(a,enc)==asUnicode(b,enc)
 
-def eqCheck(r,x):
-    if r!=x:
-        print('Strings unequal\nexp: %s\ngot: %s' % (ascii(x),ascii(r)))
+def equalStrings(a, b, enc='utf8'):
+    return a == b if type(a) == type(b) else asUnicode(a, enc) == asUnicode(b, enc)
+
+
+def eqCheck(r, x):
+    if r != x:
+        print('Strings unequal\nexp: %s\ngot: %s' % (ascii(x), ascii(r)))
+
 
 def rlextraNeeded():
     try:
-        import rlextra
+        import rlextra  # noqa
         return False
-    except:
+    except Exception:
         return True
 
-def rlSkipIf(cond,reason,__module__=None):
+
+def rlSkipIf(cond, reason, __module__=None):
     def inner(func):
         @functools.wraps(func)
-        def wrapper(*args,**kwds):
-            if cond and os.environ.get('RL_indicateSkips','0')=='1':
+        def wrapper(*args, **kwds):
+            if cond and os.environ.get('RL_indicateSkips', '0') == '1':
                 print(f'''
 skipping {func.__module__ or __module__}.{func.__name__} {reason}''')
-            return unittest.skipIf(cond,reason)(func)(*args,**kwds)
+            return unittest.skipIf(cond, reason)(func)(*args, **kwds)
         return wrapper
     return inner
 
-def rlSkipUnless(cond,reason,__module__=None):
-    return rlSkipIf(not cond,reason,__module__=__module__)
 
-def rlSkip(reason,__module__=None):
-    return rlSkipIf(True,reason,__module__=__module__)
+def rlSkipUnless(cond, reason, __module__=None):
+    return rlSkipIf(not cond, reason, __module__=__module__)
+
+
+def rlSkip(reason, __module__=None):
+    return rlSkipIf(True, reason, __module__=__module__)
