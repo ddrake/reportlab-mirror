@@ -1,9 +1,10 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-#history https://hg.reportlab.com/hg-public/reportlab/log/tip/src/reportlab/graphics/charts/markers.py
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+# history https://hg.reportlab.com/hg-public/reportlab/log/tip
+#                                           /src/reportlab/graphics/charts/markers.py
 
-__version__='3.3.0'
-__doc__="""This modules defines a collection of markers used in charts.
+__version__ = '3.3.0'
+"""This modules defines a collection of markers used in charts.
 
 The make* functions return a simple shape or a widget as for
 the smiley.
@@ -40,7 +41,7 @@ def makeFilledDiamond(x, y, size, color):
     "Make a filled diamond marker."
 
     d = size/2.0
-    poly = Polygon((x-d,y, x,y+d, x+d,y, x,y-d))
+    poly = Polygon((x-d, y, x, y+d, x+d, y, x, y-d))
     poly.strokeColor = color
     poly.fillColor = color
 
