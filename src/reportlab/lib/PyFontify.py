@@ -1,7 +1,7 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-__version__='3.3.0'
-__doc__="""
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+__version__ = '3.3.0'
+"""
 Module to analyze Python source code; for syntax coloring tools.
 
 Interface::
@@ -11,7 +11,8 @@ Interface::
  - The 'pytext' argument is a string containing Python source code.
  - The (optional) arguments 'searchfrom' and 'searchto' may contain a slice in pytext.
  - The returned value is a list of tuples, formatted like this::
-    [('keyword', 0, 6, None), ('keyword', 11, 17, None), ('comment', 23, 53, None), etc. ]
+    [('keyword', 0, 6, None), ('keyword', 11, 17, None),
+     ('comment', 23, 53, None), etc. ]
 
  - The tuple contents are always like this::
     (tag, startindex, endindex, sublist)
@@ -36,9 +37,11 @@ __version__ = "0.4"
 
 import re
 
+
 # First a little helper, since I don't like to repeat things. (Tismer speaking)
 def replace(src, sep, rep):
     return rep.join(src.split(sep))
+
 
 # This list of keywords is taken from ref/node13.html of the
 # Python 1.3 HTML documentation. ("access" is intentionally omitted.)
@@ -97,7 +100,7 @@ idKeyPat = "[ \t]*[A-Za-z_][A-Za-z_0-9.]*"  # Ident w. leading whitespace.
 idRE = re.compile(idKeyPat)
 
 
-def fontify(pytext, searchfrom = 0, searchto = None):
+def fontify(pytext, searchfrom=0, searchto=None):
     if searchto is None:
         searchto = len(pytext)
     # Cache a few attributes for quicker reference.

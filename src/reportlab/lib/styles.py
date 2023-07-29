@@ -1,8 +1,9 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-#history https://hg.reportlab.com/hg-public/reportlab/log/tip/src/reportlab/lib/styles.py
-__version__='3.3.0'
-__doc__='''Classes for ParagraphStyle and similar things.
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+# history https://hg.reportlab.com/hg-public/reportlab/log/tip
+#                                            /src/reportlab/lib/styles.py
+__version__ = '3.3.0'
+'''Classes for ParagraphStyle and similar things.
 
 A style is a collection of attributes, but with some extra features
 to allow 'inheritance' from a parent, and to ensure nobody makes
@@ -14,7 +15,7 @@ paragraphs.
 getSampleStyleSheet()  returns a stylesheet you can use for initial
 development, with a few basic heading and text styles.
 '''
-__all__=(
+__all__ = (
         'PropertySet',
         'ParagraphStyle',
         'LineStyle',
@@ -25,22 +26,23 @@ __all__=(
 from reportlab.lib.colors import black
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from reportlab.lib.fonts import tt2ps
-from reportlab.rl_config import canvas_basefontname as _baseFontName, \
-                                underlineWidth as _baseUnderlineWidth, \
-                                underlineOffset as _baseUnderlineOffset, \
-                                underlineGap as _baseUnderlineGap, \
-                                strikeWidth as _baseStrikeWidth, \
-                                strikeOffset as _baseStrikeOffset, \
-                                strikeGap as _baseStrikeGap, \
-                                spaceShrinkage as _spaceShrinkage, \
-                                platypus_link_underline as _platypus_link_underline, \
-                                hyphenationLang as _hyphenationLang, \
-                                hyphenationMinWordLength as _hyphenationMinWordLength, \
-                                uriWasteReduce as _uriWasteReduce, \
-                                embeddedHyphenation as _embeddedHyphenation
-_baseFontNameB = tt2ps(_baseFontName,1,0)
-_baseFontNameI = tt2ps(_baseFontName,0,1)
-_baseFontNameBI = tt2ps(_baseFontName,1,1)
+from reportlab.rl_config import (canvas_basefontname as _baseFontName,
+                                 underlineWidth as _baseUnderlineWidth,
+                                 underlineOffset as _baseUnderlineOffset,
+                                 underlineGap as _baseUnderlineGap,
+                                 strikeWidth as _baseStrikeWidth,
+                                 strikeOffset as _baseStrikeOffset,
+                                 strikeGap as _baseStrikeGap,
+                                 spaceShrinkage as _spaceShrinkage,
+                                 platypus_link_underline as _platypus_link_underline,
+                                 hyphenationLang as _hyphenationLang,
+                                 hyphenationMinWordLength as _hyphenationMinWordLength,
+                                 uriWasteReduce as _uriWasteReduce,
+                                 embeddedHyphenation as _embeddedHyphenation)
+_baseFontNameB = tt2ps(_baseFontName, 1, 0)
+_baseFontNameI = tt2ps(_baseFontName, 0, 1)
+_baseFontNameBI = tt2ps(_baseFontName, 1, 1)
+
 
 ###########################################################
 # This class provides an 'instance inheritance'
@@ -56,26 +58,30 @@ class PropertySet:
         if any.  All the work is done in init - styles
         should cost little to use at runtime."""
         # step one - validate the hell out of it
-        assert 'name' not in self.defaults, "Class Defaults may not contain a 'name' attribute"
-        assert 'parent' not in self.defaults, "Class Defaults may not contain a 'parent' attribute"
+        assert 'name' not in self.defaults, (
+            "Class Defaults may not contain a 'name' attribute")
+        assert 'parent' not in self.defaults, (
+            "Class Defaults may not contain a 'parent' attribute")
         if parent:
-            assert parent.__class__ == self.__class__, "Parent style %s must have same class as new style %s" % (parent.__class__.__name__,self.__class__.__name__)
+            assert parent.__class__ == self.__class__, (
+                "Parent style %s must have same class as new style %s" %
+                (parent.__class__.__name__, self.__class__.__name__))
 
-        #step two
+        # step two
         self.name = name
         self.parent = parent
         self.__dict__.update(self.defaults)
 
-        #step two - copy from parent if any.  Try to be
+        # step two - copy from parent if any.  Try to be
         # very strict that only keys in class defaults are
         # allowed, so they cannot inherit
         self.refresh()
         self._setKwds(**kw)
 
-    def _setKwds(self,**kw):
-        #step three - copy keywords if any
+    def _setKwds(self, **kw):
+        # step three - copy keywords if any
         for key, value in kw.items():
-             self.__dict__[key] = value
+            self.__dict__[key] = value
 
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self.name)
@@ -86,7 +92,7 @@ class PropertySet:
         used by __init__"""
         if self.parent:
             for key, value in self.parent.__dict__.items():
-                if (key not in ['name','parent']):
+                if (key not in ['name', 'parent']):
                     self.__dict__[key] = value
 
     def listAttrs(self, indent=''):
@@ -101,74 +107,86 @@ class PropertySet:
             print(indent + '%s = %s' % (key, value))
 
     def clone(self, name, parent=None, **kwds):
-        r = self.__class__(name,parent)
+        r = self.__class__(name, parent)
         r.__dict__ = self.__dict__.copy()
         r.name = name
         r.parent = parent is None and self or parent
         r._setKwds(**kwds)
         return r
 
+
 class ParagraphStyle(PropertySet):
     defaults = {
-        'fontName':_baseFontName,
-        'fontSize':10,
-        'leading':12,
-        'leftIndent':0,
-        'rightIndent':0,
-        'firstLineIndent':0,
-        'alignment':TA_LEFT,
-        'spaceBefore':0,
-        'spaceAfter':0,
-        'bulletFontName':_baseFontName,
-        'bulletFontSize':10,
-        'bulletIndent':0,
-        #'bulletColor':black,
-        'textColor': black,
-        'backColor':None,
-        'wordWrap':None,        #None means do nothing special
-                                #CJK use Chinese Line breaking
-                                #LTR RTL use left to right / right to left
-                                #with support from pyfribi2 if available
+        'fontName': _baseFontName,
+        'fontSize': 10,
+        'leading': 12,
+        'leftIndent': 0,
+        'rightIndent': 0,
+        'firstLineIndent': 0,
+        'alignment': TA_LEFT,
+        'spaceBefore': 0,
+        'spaceAfter': 0,
+        'bulletFontName': _baseFontName,
+        'bulletFontSize': 10,
+        'bulletIndent': 0,
+        # 'bulletColor': black,
+        'textColor':  black,
+        'backColor': None,
+        'wordWrap': None,        # None means do nothing special
+                                 # CJK use Chinese Line breaking
+                                 # LTR RTL use left to right / right to left
+                                 # with support from pyfribi2 if available
         'borderWidth': 0,
         'borderPadding': 0,
         'borderColor': None,
         'borderRadius': None,
         'allowWidows': 1,
         'allowOrphans': 0,
-        'textTransform':None,   #uppercase lowercase (captitalize not yet) or None or absent
-        'endDots':None,         #dots on the last line of left/right justified paras
-                                #string or object with text and optional fontName, fontSize, textColor & backColor
-                                #dy
-        'splitLongWords':1,     #make best efforts to split long words
-        'underlineWidth': _baseUnderlineWidth,  #underline width default
-        'bulletAnchor': 'start',    #where the bullet is anchored ie start, middle, end or numeric
-        'justifyLastLine': 0,   #n allow justification on the last line for more than n words 0 means don't bother
-        'justifyBreaks': 0,     #justify lines broken with <br/>
-        'spaceShrinkage': _spaceShrinkage,  #allow shrinkage of percentage of space to fit on line
-        'strikeWidth': _baseStrikeWidth,    #stroke width default
-        'underlineOffset': _baseUnderlineOffset,    #fraction of fontsize to offset underlines
-        'underlineGap': _baseUnderlineGap,      #gap for double/triple underline
-        'strikeOffset': _baseStrikeOffset,  #fraction of fontsize to offset strikethrough
-        'strikeGap': _baseStrikeGap,        #gap for double/triple strike
+        # uppercase lowercase (captitalize not yet) or None or absent
+        'textTransform': None,
+        # dots on the last line of left/right justified paras
+        # string or object with text and optional fontName, fontSize,
+        # textColor & backColor
+        'endDots': None,
+        'splitLongWords': 1,     # make best efforts to split long words
+        'underlineWidth': _baseUnderlineWidth,  # underline width default
+        # where the bullet is anchored ie start, middle, end or numeric
+        'bulletAnchor': 'start',
+        # n allow justification on the last line for more
+        # than n words 0 means don't bother
+        'justifyLastLine': 0,
+        'justifyBreaks': 0,     # justify lines broken with <br/>
+        # allow shrinkage of percentage of space to fit on line
+        'spaceShrinkage': _spaceShrinkage,
+        'strikeWidth': _baseStrikeWidth,    # stroke width default
+        # fraction of fontsize to offset underlines
+        'underlineOffset': _baseUnderlineOffset,
+        'underlineGap': _baseUnderlineGap,      # gap for double/triple underline
+        # fraction of fontsize to offset strikethrough
+        'strikeOffset': _baseStrikeOffset,
+        'strikeGap': _baseStrikeGap,        # gap for double/triple strike
         'linkUnderline': _platypus_link_underline,
         'underlineColor':   None,
         'strikeColor': None,
         'hyphenationLang': _hyphenationLang,
-        #'hyphenationMinWordLength': _hyphenationMinWordLength,
+        # 'hyphenationMinWordLength': _hyphenationMinWordLength,
         'embeddedHyphenation': _embeddedHyphenation,
         'uriWasteReduce': _uriWasteReduce,
         }
 
+
 class LineStyle(PropertySet):
     defaults = {
-        'width':1,
-        'color': black
+        'width': 1,
+        'color':  black
         }
+
     def prepareCanvas(self, canvas):
         """You can ask a LineStyle to set up the canvas for drawing
         the lines."""
         canvas.setLineWidth(1)
-        #etc. etc.
+        # etc. etc.
+
 
 class ListStyle(PropertySet):
     defaults = dict(
@@ -183,29 +201,32 @@ class ListStyle(PropertySet):
                 bulletDedent='auto',
                 bulletDir='ltr',
                 bulletFormat=None,
-                start=None,         #starting value for a list; if a list then the start sequence
+                # starting value for a list; if a list then the start sequence
+                start=None,
                 )
 
+
 _stylesheet1_undefined = object()
+
 
 class StyleSheet1:
     """
     This may or may not be used.  The idea is to:
-    
+
     1. slightly simplify construction of stylesheets;
-    
+
     2. enforce rules to validate styles when added
        (e.g. we may choose to disallow having both
        'heading1' and 'Heading1' - actual rules are
        open to discussion);
-       
+
     3. allow aliases and alternate style lookup
        mechanisms
-       
+
     4. Have a place to hang style-manipulation
        methods (save, load, maybe support a GUI
        editor)
-   
+
     Access is via getitem, so they can be
     compatible with plain old dictionaries.
     """
@@ -223,17 +244,18 @@ class StyleSheet1:
             except KeyError:
                 raise KeyError("Style '%s' not found in stylesheet" % key)
 
-    def get(self,key,default=_stylesheet1_undefined):
+    def get(self, key, default=_stylesheet1_undefined):
         try:
             return self[key]
         except KeyError:
-            if default!=_stylesheet1_undefined: return default
+            if default != _stylesheet1_undefined:
+                return default
             raise
 
     def __contains__(self, key):
         return key in self.byAlias or key in self.byName
 
-    def has_key(self,key):
+    def has_key(self, key):
         return key in self
 
     def add(self, style, alias=None):
@@ -247,8 +269,9 @@ class StyleSheet1:
             if alias in self.byName:
                 raise KeyError("Style '%s' already defined in stylesheet" % alias)
             if alias in self.byAlias:
-                raise KeyError("Alias name '%s' is already an alias in stylesheet" % alias)
-        #passed all tests?  OK, add it
+                raise KeyError("Alias name '%s' is already an alias in stylesheet"
+                               % alias)
+        # passed all tests?  OK, add it
         self.byName[key] = style
         if alias:
             self.byAlias[alias] = style
@@ -265,8 +288,9 @@ class StyleSheet1:
             style.listAttrs('    ')
             print()
 
+
 def testStyles():
-    pNormal = ParagraphStyle('Normal',None)
+    pNormal = ParagraphStyle('Normal', None)
     pNormal.fontName = _baseFontName
     pNormal.fontSize = 12
     pNormal.leading = 14.4
@@ -277,6 +301,7 @@ def testStyles():
     pPre.fontName = 'Courier'
     pPre.listAttrs()
     return pNormal, pPre
+
 
 def getSampleStyleSheet():
     """Returns a stylesheet object"""
@@ -294,12 +319,12 @@ def getSampleStyleSheet():
                    )
     stylesheet.add(ParagraphStyle(name='Italic',
                                   parent=stylesheet['BodyText'],
-                                  fontName = _baseFontNameI)
+                                  fontName=_baseFontNameI)
                    )
 
     stylesheet.add(ParagraphStyle(name='Heading1',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameB,
+                                  fontName=_baseFontNameB,
                                   fontSize=18,
                                   leading=22,
                                   spaceAfter=6),
@@ -307,7 +332,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Title',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameB,
+                                  fontName=_baseFontNameB,
                                   fontSize=18,
                                   leading=22,
                                   alignment=TA_CENTER,
@@ -316,7 +341,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Heading2',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameB,
+                                  fontName=_baseFontNameB,
                                   fontSize=14,
                                   leading=18,
                                   spaceBefore=12,
@@ -325,7 +350,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Heading3',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameBI,
+                                  fontName=_baseFontNameBI,
                                   fontSize=12,
                                   leading=14,
                                   spaceBefore=12,
@@ -334,7 +359,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Heading4',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameBI,
+                                  fontName=_baseFontNameBI,
                                   fontSize=10,
                                   leading=12,
                                   spaceBefore=10,
@@ -343,7 +368,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Heading5',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameB,
+                                  fontName=_baseFontNameB,
                                   fontSize=9,
                                   leading=10.8,
                                   spaceBefore=8,
@@ -352,7 +377,7 @@ def getSampleStyleSheet():
 
     stylesheet.add(ParagraphStyle(name='Heading6',
                                   parent=stylesheet['Normal'],
-                                  fontName = _baseFontNameB,
+                                  fontName=_baseFontNameB,
                                   fontSize=7,
                                   leading=8.4,
                                   spaceBefore=6,
@@ -384,38 +409,39 @@ def getSampleStyleSheet():
                                   hyphenationLang=''))
 
     stylesheet.add(ListStyle(name='UnorderedList',
-                                parent=None,
-                                leftIndent=18,
-                                rightIndent=0,
-                                bulletAlign='left',
-                                bulletType='1',
-                                bulletColor=black,
-                                bulletFontName='Helvetica',
-                                bulletFontSize=12,
-                                bulletOffsetY=0,
-                                bulletDedent='auto',
-                                bulletDir='ltr',
-                                bulletFormat=None,
-                                #start='circle square blackstar sparkle disc diamond'.split(),
-                                start=None,
-                            ),
+                             parent=None,
+                             leftIndent=18,
+                             rightIndent=0,
+                             bulletAlign='left',
+                             bulletType='1',
+                             bulletColor=black,
+                             bulletFontName='Helvetica',
+                             bulletFontSize=12,
+                             bulletOffsetY=0,
+                             bulletDedent='auto',
+                             bulletDir='ltr',
+                             bulletFormat=None,
+                             # start='circle square blackstar
+                             #   sparkle disc diamond'.split(),
+                             start=None,
+                             ),
                    alias='ul')
 
     stylesheet.add(ListStyle(name='OrderedList',
-                                parent=None,
-                                leftIndent=18,
-                                rightIndent=0,
-                                bulletAlign='left',
-                                bulletType='1',
-                                bulletColor=black,
-                                bulletFontName='Helvetica',
-                                bulletFontSize=12,
-                                bulletOffsetY=0,
-                                bulletDedent='auto',
-                                bulletDir='ltr',
-                                bulletFormat=None,
-                                #start='1 a A i I'.split(),
-                                start=None,
-                            ),
+                             parent=None,
+                             leftIndent=18,
+                             rightIndent=0,
+                             bulletAlign='left',
+                             bulletType='1',
+                             bulletColor=black,
+                             bulletFontName='Helvetica',
+                             bulletFontSize=12,
+                             bulletOffsetY=0,
+                             bulletDedent='auto',
+                             bulletDir='ltr',
+                             bulletFormat=None,
+                             # start='1 a A i I'.split(),
+                             start=None,
+                             ),
                    alias='ol')
     return stylesheet

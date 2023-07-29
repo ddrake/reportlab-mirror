@@ -1,14 +1,17 @@
 #!/bin/env python
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-#history https://hg.reportlab.com/hg-public/reportlab/log/tip/src/reportlab/lib/randomtext.py
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+# history https://hg.reportlab.com/hg-public/reportlab/log/tip
+#                                           /src/reportlab/lib/randomtext.py
 
-__version__='3.3.0'
+__version__ = '3.3.0'
+
+from reportlab import rl_config
 
 ###############################################################################
 #   generates so-called 'Greek Text' for use in filling documents.
 ###############################################################################
-__doc__="""Like Lorem Ipsum, but more fun and extensible.
+"""Like Lorem Ipsum, but more fun and extensible.
 
 This module exposes a function randomText() which generates paragraphs.
 These can be used when testing out document templates and stylesheets.
@@ -34,14 +37,16 @@ EXAMPLE USAGE:
 
 """
 
-#theme one :-)
-STARTUP = ['strategic', 'direction', 'proactive', 'venture capital',
+# theme one :-)
+STARTUP = [
+    'strategic', 'direction', 'proactive', 'venture capital',
     'reengineering', 'forecast', 'resources', 'SWOT analysis',
     'forward-thinking', 'profit', 'growth', 'doubletalk', 'B2B', 'B2C',
     'venture capital', 'IPO', "NASDAQ meltdown - we're all doomed!"]
 
-#theme two - computery things.
-COMPUTERS = ['Python', 'Perl', 'Pascal', 'Java', 'Javascript',
+# theme two - computery things.
+COMPUTERS = [
+    'Python', 'Perl', 'Pascal', 'Java', 'Javascript',
     'VB', 'Basic', 'LISP', 'Fortran', 'ADA', 'APL', 'C', 'C++',
     'assembler', 'Larry Wall', 'Guido van Rossum', 'XML', 'HTML',
     'cgi', 'cgi-bin', 'Amiga', 'Macintosh', 'Dell', 'Microsoft',
@@ -58,52 +63,56 @@ COMPUTERS = ['Python', 'Perl', 'Pascal', 'Java', 'Javascript',
     'Icon', 'IDL', 'Infer', 'Intercal', 'J', 'Java', 'JavaScript', 'CD-ROM',
     'JCL', 'Lisp', '"literate programming"', 'Logo', 'MUMPS', 'C: drive',
     'Modula-2', 'Modula-3', 'Oberon', 'Occam', 'OpenGL', 'parallel languages',
-    'Pascal', 'Perl', 'PL/I', 'PostScript', 'Prolog', 'hardware', 'Blue Screen of Death',
-    'Rexx', 'RPG', 'Scheme', 'scripting languages', 'Smalltalk', 'crash!', 'disc crash',
-    'Spanner', 'SQL', 'Tcl/Tk', 'TeX', 'TOM', 'Visual', 'Visual Basic', '4GL',
-    'VRML', 'Virtual Reality Modeling Language', 'difference engine', '...went into "yo-yo mode"',
+    'Pascal', 'Perl', 'PL/I', 'PostScript', 'Prolog', 'hardware',
+    'Blue Screen of Death', 'Rexx', 'RPG', 'Scheme', 'scripting languages',
+    'Smalltalk', 'crash!', 'disc crash', 'Spanner', 'SQL', 'Tcl/Tk', 'TeX', 'TOM',
+    'Visual', 'Visual Basic', '4GL', 'VRML', 'Virtual Reality Modeling Language',
+    'difference engine', '...went into "yo-yo mode"',
     'Sun', 'Sun Microsystems', 'Hewlett Packard', 'output device',
     'CPU', 'memory', 'registers', 'monitor', 'TFT display', 'plasma screen',
     'bug report', '"mis-feature"', '...millions of bugs!', 'pizza',
-    '"illiterate programming"','...lots of pizza!', 'pepperoni pizza',
+    '"illiterate programming"', '...lots of pizza!', 'pepperoni pizza',
     'coffee', 'Jolt Cola[TM]', 'beer', 'BEER!']
 
-#theme three - 'blah' - for when you want to be subtle. :-)
-BLAH = ['Blah', 'BLAH', 'blahblah', 'blahblahblah', 'blah-blah',
+# theme three - 'blah' - for when you want to be subtle. :-)
+BLAH = [
+    'Blah', 'BLAH', 'blahblah', 'blahblahblah', 'blah-blah',
     'blah!', '"Blah Blah Blah"', 'blah-de-blah', 'blah?', 'blah!!!',
     'blah...', 'Blah.', 'blah;', 'blah, Blah, BLAH!', 'Blah!!!']
 
-#theme four - 'buzzword bingo' time!
-BUZZWORD = ['intellectual capital', 'market segment', 'flattening',
-        'regroup', 'platform', 'client-based', 'long-term', 'proactive',
-        'quality vector', 'out of the loop', 'implement',
-        'streamline', 'cost-centered', 'phase', 'synergy',
-        'synergize', 'interactive', 'facilitate',
-        'appropriate', 'goal-setting', 'empowering', 'low-risk high-yield',
-        'peel the onion', 'goal', 'downsize', 'result-driven',
-        'conceptualize', 'multidisciplinary', 'gap analysis', 'dysfunctional',
-        'networking', 'knowledge management', 'goal-setting',
-        'mastery learning', 'communication', 'real-estate', 'quarterly',
-        'scalable', 'Total Quality Management', 'best of breed',
-        'nimble', 'monetize', 'benchmark', 'hardball',
-        'client-centered', 'vision statement', 'empowerment',
-        'lean & mean', 'credibility', 'synergistic',
-        'backward-compatible', 'hardball', 'stretch the envelope',
-        'bleeding edge', 'networking', 'motivation', 'best practice',
-        'best of breed', 'implementation', 'Total Quality Management',
-        'undefined', 'disintermediate', 'mindset', 'architect',
-        'gap analysis', 'morale', 'objective', 'projection',
-        'contribution', 'proactive', 'go the extra mile', 'dynamic',
-        'world class', 'real estate', 'quality vector', 'credibility',
-        'appropriate', 'platform', 'projection', 'mastery learning',
-        'recognition', 'quality', 'scenario', 'performance based',
-        'solutioning', 'go the extra mile', 'downsize', 'phase',
-        'networking', 'experiencing slippage', 'knowledge management',
-        'high priority', 'process', 'ethical', 'value-added', 'implement',
-        're-factoring', 're-branding', 'embracing change']
+# theme four - 'buzzword bingo' time!
+BUZZWORD = [
+    'intellectual capital', 'market segment', 'flattening',
+    'regroup', 'platform', 'client-based', 'long-term', 'proactive',
+    'quality vector', 'out of the loop', 'implement',
+    'streamline', 'cost-centered', 'phase', 'synergy',
+    'synergize', 'interactive', 'facilitate',
+    'appropriate', 'goal-setting', 'empowering', 'low-risk high-yield',
+    'peel the onion', 'goal', 'downsize', 'result-driven',
+    'conceptualize', 'multidisciplinary', 'gap analysis', 'dysfunctional',
+    'networking', 'knowledge management', 'goal-setting',
+    'mastery learning', 'communication', 'real-estate', 'quarterly',
+    'scalable', 'Total Quality Management', 'best of breed',
+    'nimble', 'monetize', 'benchmark', 'hardball',
+    'client-centered', 'vision statement', 'empowerment',
+    'lean & mean', 'credibility', 'synergistic',
+    'backward-compatible', 'hardball', 'stretch the envelope',
+    'bleeding edge', 'networking', 'motivation', 'best practice',
+    'best of breed', 'implementation', 'Total Quality Management',
+    'undefined', 'disintermediate', 'mindset', 'architect',
+    'gap analysis', 'morale', 'objective', 'projection',
+    'contribution', 'proactive', 'go the extra mile', 'dynamic',
+    'world class', 'real estate', 'quality vector', 'credibility',
+    'appropriate', 'platform', 'projection', 'mastery learning',
+    'recognition', 'quality', 'scenario', 'performance based',
+    'solutioning', 'go the extra mile', 'downsize', 'phase',
+    'networking', 'experiencing slippage', 'knowledge management',
+    'high priority', 'process', 'ethical', 'value-added', 'implement',
+    're-factoring', 're-branding', 'embracing change']
 
-#theme five - Star Trek
-STARTREK = ['Starfleet', 'Klingon', 'Romulan', 'Cardassian', 'Vulcan',
+# theme five - Star Trek
+STARTREK = [
+    'Starfleet', 'Klingon', 'Romulan', 'Cardassian', 'Vulcan',
     'Benzite', 'IKV Pagh', 'emergency transponder', 'United Federation of Planets',
     'Bolian', "K'Vort Class Bird-of-Prey", 'USS Enterprise', 'USS Intrepid',
     'USS Reliant', 'USS Voyager', 'Starfleet Academy', 'Captain Picard',
@@ -115,14 +124,16 @@ STARTREK = ['Starfleet', 'Klingon', 'Romulan', 'Cardassian', 'Vulcan',
     'William Riker', "Chief O'Brian", 'Soyuz class science vessel', 'Wolf-359',
     'Galaxy class vessel', 'Utopia Planitia yards', 'photon torpedo', 'Archer IV',
     'quantum flux', 'spacedock', 'Risa', 'Deep Space Nine', 'blood wine',
-    'quantum torpedoes', 'holodeck', 'Romulan Warbird', 'Betazoid', 'turbolift', 'battle bridge',
-    'Memory Alpha', '...with a phaser!', 'Romulan ale', 'Ferrengi', 'Klingon opera',
-    'Quark', 'wormhole', 'Bajoran', 'cruiser', 'warship', 'battlecruiser', '"Intruder alert!"',
-    'scout ship', 'science vessel', '"Borg Invasion imminent!" ', '"Abandon ship!"',
-    'Red Alert!', 'warp-core breech', '"All hands abandon ship! This is not a drill!"']
+    'quantum torpedoes', 'holodeck', 'Romulan Warbird', 'Betazoid', 'turbolift',
+    'battle bridge', 'Memory Alpha', '...with a phaser!', 'Romulan ale', 'Ferrengi',
+    'Klingon opera', 'Quark', 'wormhole', 'Bajoran', 'cruiser', 'warship',
+    'battlecruiser', '"Intruder alert!"', 'scout ship', 'science vessel',
+    '"Borg Invasion imminent!" ', '"Abandon ship!"', 'Red Alert!', 'warp-core breech',
+    '"All hands abandon ship! This is not a drill!"']
 
-#theme six - print-related terms
-PRINTING = ['points', 'picas', 'leading', 'kerning', 'CMYK', 'offset litho',
+# theme six - print-related terms
+PRINTING = [
+    'points', 'picas', 'leading', 'kerning', 'CMYK', 'offset litho',
     'type', 'font family', 'typography', 'type designer',
     'baseline', 'white-out type', 'WOB', 'bicameral', 'bitmap',
     'blockletter', 'bleed', 'margin', 'body', 'widow', 'orphan',
@@ -135,56 +146,75 @@ PRINTING = ['points', 'picas', 'leading', 'kerning', 'CMYK', 'offset litho',
     'prepress', 'spot-colour', 'duotones', 'colour separations', 'four-colour printing',
     'Pantone[TM]', 'service bureau', 'imagesetter']
 
-#it had to be done!...
-#theme seven - the "full Monty"!
-PYTHON = ['Good evening ladies and Bruces','I want to buy some cheese', 'You do have some cheese, do you?',
-          "Of course sir, it's a cheese shop sir, we've got...",'discipline?... naked? ... With a melon!?',
-          'The Church Police!!' , "There's a dead bishop on the landing", 'Would you like a twist of lemming sir?',
-          '"Conquistador Coffee brings a new meaning to the word vomit"','Your lupins please',
-          'Crelm Toothpaste, with the miracle ingredient Fraudulin',
-          "Well there's the first result and the Silly Party has held Leicester.",
-          'Hello, I would like to buy a fish license please', "Look, it's people like you what cause unrest!",
-          "When we got home, our Dad would thrash us to sleep with his belt!", 'Luxury', "Gumby Brain Specialist",
-          "My brain hurts!!!", "My brain hurts too.", "How not to be seen",
-          "In this picture there are 47 people. None of them can be seen",
-          "Mrs Smegma, will you stand up please?",
-          "Mr. Nesbitt has learned the first lesson of 'Not Being Seen', not to stand up.",
-          "My hovercraft is full of eels", "Ah. You have beautiful thighs.", "My nipples explode with delight",
-          "Drop your panties Sir William, I cannot wait 'til lunchtime",
-          "I'm a completely self-taught idiot.", "I always wanted to be a lumberjack!!!",
-          "Told you so!! Oh, coitus!!", "",
-          "Nudge nudge?", "Know what I mean!", "Nudge nudge, nudge nudge?", "Say no more!!",
-          "Hello, well it's just after 8 o'clock, and time for the penguin on top of your television set to explode",
-          "Oh, intercourse the penguin!!", "Funny that penguin being there, isn't it?",
-          "I wish to register a complaint.", "Now that's what I call a dead parrot", "Pining for the fjords???",
-          "No, that's not dead, it's ,uhhhh, resting", "This is an ex-parrot!!",
-          "That parrot is definitely deceased.", "No, no, no - it's spelt Raymond Luxury Yach-t, but it's pronounced 'Throatwobbler Mangrove'.",
-          "You're a very silly man and I'm not going to interview you.", "No Mungo... never kill a customer."
-          "And I'd like to conclude by putting my finger up my nose",
-          "egg and Spam", "egg bacon and Spam", "egg bacon sausage and Spam", "Spam bacon sausage and Spam",
-          "Spam egg Spam Spam bacon and Spam", "Spam sausage Spam Spam Spam bacon Spam tomato and Spam",
-          "Spam Spam Spam egg and Spam", "Spam Spam Spam Spam Spam Spam baked beans Spam Spam Spam",
-          "Spam!!", "I don't like Spam!!!", "You can't have egg, bacon, Spam and sausage without the Spam!",
-          "I'll have your Spam. I Love it!",
-          "I'm having Spam Spam Spam Spam Spam Spam Spam baked beans Spam Spam Spam and Spam",
-          "Have you got anything without Spam?", "There's Spam egg sausage and Spam, that's not got much Spam in it.",
-          "No one expects the Spanish Inquisition!!", "Our weapon is surprise, surprise and fear!",
-          "Get the comfy chair!", "Amongst our weaponry are such diverse elements as: fear, surprise, ruthless efficiency, an almost fanatical devotion to the Pope, and nice red uniforms - Oh damn!",
-          "Nobody expects the... Oh bugger!", "What swims in the sea and gets caught in nets? Henri Bergson?",
-          "Goats. Underwater goats with snorkels and flippers?", "A buffalo with an aqualung?",
-          "Dinsdale was a looney, but he was a happy looney.", "Dinsdale!!",
-          "The 127th Upper-Class Twit of the Year Show", "What a great Twit!",
-          "thought by many to be this year's outstanding twit",
-          "...and there's a big crowd here today to see these prize idiots in action.",
-          "And now for something completely different.", "Stop that, it's silly",
-          "We interrupt this program to annoy you and make things generally irritating",
-          "This depraved and degrading spectacle is going to stop right now, do you hear me?",
-          "Stop right there!", "This is absolutely disgusting and I'm not going to stand for it",
-          "I object to all this sex on the television. I mean, I keep falling off",
-          "Right! Stop that, it's silly. Very silly indeed", "Very silly indeed", "Lemon curry?",
-          "And now for something completely different, a man with 3 buttocks",
-          "I've heard of unisex, but I've never had it", "That's the end, stop the program! Stop it!"]
-leadins=[
+# it had to be done!...
+# theme seven - the "full Monty"!
+PYTHON = [
+    'Good evening ladies and Bruces', 'I want to buy some cheese',
+    'You do have some cheese, do you?',
+    "Of course sir, it's a cheese shop sir, we've got...",
+    'discipline?... naked? ... With a melon!?', 'The Church Police!!' ,
+    "There's a dead bishop on the landing",
+    'Would you like a twist of lemming sir?',
+    '"Conquistador Coffee brings a new meaning to the word vomit"',
+    'Your lupins please',
+    'Crelm Toothpaste, with the miracle ingredient Fraudulin',
+    "Well there's the first result and the Silly Party has held Leicester.",
+    'Hello, I would like to buy a fish license please',
+    "Look, it's people like you what cause unrest!",
+    "When we got home, our Dad would thrash us to sleep with his belt!",
+    'Luxury', "Gumby Brain Specialist",
+    "My brain hurts!!!", "My brain hurts too.", "How not to be seen",
+    "In this picture there are 47 people. None of them can be seen",
+    "Mrs Smegma, will you stand up please?",
+    "Mr. Nesbitt has learned the first lesson of 'Not Being Seen', not to stand up.",
+    "My hovercraft is full of eels", "Ah. You have beautiful thighs.",
+    "My nipples explode with delight",
+    "Drop your panties Sir William, I cannot wait 'til lunchtime",
+    "I'm a completely self-taught idiot.", "I always wanted to be a lumberjack!!!",
+    "Told you so!! Oh, coitus!!", "",
+    "Nudge nudge?", "Know what I mean!", "Nudge nudge, nudge nudge?", "Say no more!!",
+    "Oh, intercourse the penguin!!", "Funny that penguin being there, isn't it?",
+    "I wish to register a complaint.",
+    "Now that's what I call a dead parrot", "Pining for the fjords???",
+    "No, that's not dead, it's ,uhhhh, resting", "This is an ex-parrot!!",
+    "That parrot is definitely deceased.",
+    "You're a very silly man and I'm not going to interview you.",
+    "No Mungo... never kill a customer."
+    "And I'd like to conclude by putting my finger up my nose",
+    "egg and Spam", "egg bacon and Spam", "egg bacon sausage and Spam",
+    "Spam bacon sausage and Spam", "Spam egg Spam Spam bacon and Spam",
+    "Spam sausage Spam Spam Spam bacon Spam tomato and Spam",
+    "Spam Spam Spam egg and Spam",
+    "Spam Spam Spam Spam Spam Spam baked beans Spam Spam Spam",
+    "Spam!!", "I don't like Spam!!!",
+    "You can't have egg, bacon, Spam and sausage without the Spam!",
+    "I'll have your Spam. I Love it!",
+    "I'm having Spam Spam Spam Spam Spam Spam Spam baked beans Spam Spam Spam and Spam",
+    "Have you got anything without Spam?",
+    "There's Spam egg sausage and Spam, that's not got much Spam in it.",
+    "No one expects the Spanish Inquisition!!",
+    "Our weapon is surprise, surprise and fear!",
+    "Get the comfy chair!",
+    "Nobody expects the... Oh bugger!",
+    "What swims in the sea and gets caught in nets? Henri Bergson?",
+    "Goats. Underwater goats with snorkels and flippers?",
+    "A buffalo with an aqualung?",
+    "Dinsdale was a looney, but he was a happy looney.", "Dinsdale!!",
+    "The 127th Upper-Class Twit of the Year Show", "What a great Twit!",
+    "thought by many to be this year's outstanding twit",
+    "...and there's a big crowd here today to see these prize idiots in action.",
+    "And now for something completely different.", "Stop that, it's silly",
+    "We interrupt this program to annoy you and make things generally irritating",
+    "This depraved and degrading spectacle is going to stop right now, do you hear me?",
+    "Stop right there!",
+    "This is absolutely disgusting and I'm not going to stand for it",
+    "I object to all this sex on the television. I mean, I keep falling off",
+    "Right! Stop that, it's silly. Very silly indeed", "Very silly indeed",
+    "Lemon curry?",
+    "And now for something completely different, a man with 3 buttocks",
+    "I've heard of unisex, but I've never had it",
+    "That's the end, stop the program! Stop it!"]
+leadins = [
     "To characterize a linguistic level L,",
     "On the other hand,",
     "This suggests that",
@@ -193,7 +223,8 @@ leadins=[
     "We will bring evidence in favor of the following thesis: ",
     "To provide a constituent structure for T(Z,K),",
     "From C1, it follows that",
-    "For any transformation which is sufficiently diversified in application to be of any interest,",
+    "For any transformation which is sufficiently diversified in application " +
+    "to be of any interest,",
     "Analogously,",
     "Clearly,",
     "Note that",
@@ -205,9 +236,11 @@ leadins=[
     "We have already seen that",
     "By combining adjunctions and certain deformations,",
     "I suggested that these results would follow from the assumption that",
-    "If the position of the trace in (99c) were only relatively inaccessible to movement,",
+    "If the position of the trace in (99c) were only relatively " +
+    "inaccessible to movement,",
     "However, this assumption is not correct, since",
-    "Comparing these examples with their parasitic gap counterparts in (96) and (97), we see that",
+    "Comparing these examples with their parasitic gap counterparts in " +
+    "(96) and (97), we see that",
     "In the discussion of resumptive pronouns following (81),",
     "So far,",
     "Nevertheless,",
@@ -227,9 +260,10 @@ leadins=[
     "Adopting this approach,",
     "There is no fact, no meaningful question to be answered,",
     "Another superficial similarity is the interest in simulation of behavior,",
-    "A lot of sophistication has been developed about the utilization of machines for complex purposes,",
+    "A lot of sophistication has been developed about the utilization " +
+    "of machines for complex purposes,",
     ]
- 
+
 subjects = [
     "the notion of level of grammaticalness",
     "a case of semigrammaticalness of a different sort",
@@ -238,7 +272,8 @@ subjects = [
     "the natural general principle that will subsume this case",
     "an important property of these three types of EC",
     "any associated supporting element",
-    "the appearance of parasitic gaps in domains relatively inaccessible to ordinary extraction",
+    "the appearance of parasitic gaps in domains relatively " +
+    "inaccessible to ordinary extraction",
     "the speaker-hearer's linguistic intuition",
     "the descriptive power of the base component",
     "the earlier discussion of deviance",
@@ -250,8 +285,8 @@ subjects = [
     "the systematic use of complex symbols",
     "the theory of syntactic features developed earlier",
     ]
- 
-verbs= [
+
+verbs = [
     "can be defined in such a way as to impose",
     "delimits",
     "suffices to account for",
@@ -273,9 +308,11 @@ verbs= [
 
 objects = [
     "problems of phonemic and morphological analysis.",
-    "a corpus of utterance tokens upon which conformity has been defined by the paired utterance test.",
+    "a corpus of utterance tokens upon which conformity has been " +
+    "defined by the paired utterance test.",
     "the traditional practice of grammarians.",
-    "the levels of acceptability from fairly high (e.g. (99a)) to virtual gibberish (e.g. (98d)).",
+    "the levels of acceptability from fairly high (e.g. (99a)) " +
+    "to virtual gibberish (e.g. (98d)).",
     "a stipulation to place the constructions into these various categories.",
     "a descriptive fact.",
     "a parasitic gap construction.",
@@ -287,18 +324,21 @@ objects = [
     "a general convention regarding the forms of the grammar.",
     "an abstract underlying order.",
     "an important distinction in language use.",
-    "the requirement that branching is not tolerated within the dominance scope of a complex symbol.",
+    "the requirement that branching is not tolerated within " +
+    "the dominance scope of a complex symbol.",
     "the strong generative capacity of the theory.",
     ]
 
-def format_wisdom(text,line_length=72):
+
+def format_wisdom(text, line_length=72):
     try:
         import textwrap
         return textwrap.fill(text, line_length)
-    except:
+    except Exception:
         return text
 
-def chomsky(times = 1):
+
+def chomsky(times=1):
     if not isinstance(times, int):
         return format_wisdom(__doc__)
     import random
@@ -317,19 +357,20 @@ def chomsky(times = 1):
         newparts = []
     return format_wisdom('  '.join(output))
 
-from reportlab import rl_config
+
 if rl_config.invariant:
     import random
-    #monkey patch random.randrange
+    # monkey patch random.randrange
+
     class RLMonkeyPatchRandom(random.Random):
-        def randrange(self, start, stop=None, step=1, _int=int, _maxwidth=1<<random.BPF):
+        def randrange(self, start, stop=None, step=1, _int=int,
+                      _maxwidth=1 << random.BPF):
             """Choose a random item from range(start, stop[, step]).
 
             This fixes the problem with randint() which includes the
             endpoint; in Python this is usually not what you want.
 
             """
-
             # This code is a bit messy to make it fast for the
             # common case while still doing adequate error checking.
             istart = _int(start)
@@ -365,7 +406,8 @@ if rl_config.invariant:
                     return _int(istart + self._randbelow(width))
                 return _int(istart + _int(self.random()*width))
             if step == 1:
-                raise ValueError("empty range for randrange() (%d,%d, %d)" % (istart, istop, width))
+                raise ValueError("empty range for randrange() (%d,%d, %d)" %
+                                 (istart, istop, width))
 
             # Non-unit step argument supplied.
             istep = _int(step)
@@ -384,6 +426,7 @@ if rl_config.invariant:
             if n >= _maxwidth:
                 return istart + istep*self._randbelow(n)
             return istart + istep*_int(self.random() * n)
+
         def choice(self, seq):
             """Choose a random element from a non-empty sequence."""
             return seq[int(self.random() * len(seq))]
@@ -392,17 +435,20 @@ if rl_config.invariant:
     random.randrange = random._inst.randrange
     random.choice = random._inst.choice
     del RLMonkeyPatchRandom
-    if not getattr(rl_config,'_random',None):
+    if not getattr(rl_config, '_random', None):
         rl_config._random = 1
         random.seed(2342471922)
     del random
 del rl_config
 
+
 def randomText(theme=STARTUP, sentences=5):
-    #this may or may not be appropriate in your company
-    if type(theme)==type(''):
-        if theme.lower()=='chomsky': return chomsky(sentences)
-        elif theme.upper() in ('STARTUP','COMPUTERS','BLAH','BUZZWORD','STARTREK','PRINTING','PYTHON'):
+    # this may or may not be appropriate in your company
+    if isinstance(theme, str):
+        if theme.lower() == 'chomsky':
+            return chomsky(sentences)
+        elif theme.upper() in ('STARTUP', 'COMPUTERS', 'BLAH', 'BUZZWORD', 'STARTREK',
+                               'PRINTING', 'PYTHON'):
             theme = globals()[theme.upper()]
         else:
             raise ValueError('Unknown theme "%s"' % theme)
@@ -411,20 +457,21 @@ def randomText(theme=STARTUP, sentences=5):
 
     RANDOMWORDS = theme
 
-    #sentences = 5
+    # sentences = 5
     output = ""
-    for sentenceno in range(randint(1,sentences)):
+    for sentenceno in range(randint(1, sentences)):
         output = output + 'Blah'
-        for wordno in range(randint(10,25)):
-            if randint(0,4)==0:
+        for wordno in range(randint(10, 25)):
+            if randint(0, 4) == 0:
                 word = choice(RANDOMWORDS)
             else:
                 word = 'blah'
-            output = output + ' ' +word
+            output = output + ' ' + word
         output = output+'. '
     return output
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     import sys
     argv = sys.argv[1:]
     if argv:
@@ -434,10 +481,11 @@ if __name__=='__main__':
         else:
             sentences = 5
         try:
-            print(randomText(theme,sentences))
-        except:
+            print(randomText(theme, sentences))
+        except Exception:
             sys.stderr.write("Usage: randomtext.py [theme [#sentences]]\n")
-            sys.stderr.write(" theme in chomsky|STARTUP|COMPUTERS|BLAH|BUZZWORD|STARTREK|PRINTING|PYTHON\n")
+            sys.stderr.write(" theme in chomsky|STARTUP|COMPUTERS|BLAH" +
+                             "|BUZZWORD|STARTREK|PRINTING|PYTHON\n")
             raise
     else:
         print(chomsky(5))
