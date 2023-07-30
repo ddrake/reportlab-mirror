@@ -51,6 +51,7 @@ _postnet_patterns = {
     '9' : "|.|..",    '0' : "||...",    'S' : "|",
 }
 
+
 class FIM(Barcode):
     """
     FIM (Facing ID Marks) encode only one letter.
@@ -97,8 +98,9 @@ class FIM(Barcode):
     rquiet = inch * (0.25)
     lquiet = inch * (15.0/32.0)
     quiet = 0
-    def __init__(self, value='', **args):
-        value = str(value) if isinstance(value,int) else asNative(value)
+
+    def __init__(self, value='',  **args):
+        value = str(value) if isinstance(value, int) else asNative(value)
         for k, v in args.items():
             setattr(self, k, v)
 
@@ -145,6 +147,7 @@ class FIM(Barcode):
     def _humanText(self):
         return self.value
 
+
 class POSTNET(Barcode):
     """
     POSTNET is used in the US to encode "zip codes" (postal codes) on
@@ -162,8 +165,9 @@ class POSTNET(Barcode):
     barHeight = inch * 0.125
     barWidth = inch * 0.018
     spaceWidth = inch * 0.0275
+
     def __init__(self, value='', **args):
-        value = str(value) if isinstance(value,int) else asNative(value)
+        value = str(value) if isinstance(value, int) else asNative(value)
         for k, v in args.items():
             setattr(self, k, v)
 
@@ -211,12 +215,13 @@ class POSTNET(Barcode):
         return self.decomposed
 
     def computeSize(self):
-        self._width = len(self.decomposed) * self.barWidth + (len(self.decomposed) - 1) * self.spaceWidth
+        self._width = (len(self.decomposed) * self.barWidth +
+                       (len(self.decomposed) - 1) * self.spaceWidth)
         self._height = self.barHeight
 
     def draw(self):
         self._calculate()
-        sdown = self.barHeight - self.shortHeight
+        # sdown = self.barHeight - self.shortHeight (assigned but not used)
         left = 0
 
         for c in self.decomposed:

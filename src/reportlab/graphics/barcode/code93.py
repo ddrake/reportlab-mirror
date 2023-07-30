@@ -84,24 +84,31 @@ _extended = {
     '\x7f' : '!T'
 }
 
+
 def _encode93(str):
     s = list(str)
     s.reverse()
 
     # compute 'C' checksum
-    i = 0; v = 1; c = 0
+    i = 0
+    v = 1
+    c = 0
     while i < len(s):
         c = c + v * _patterns[s[i]][1]
-        i = i + 1; v = v + 1
+        i += 1
+        v += 1
         if v > 20:
             v = 1
     s.insert(0, _charsbyval[c % 47])
 
     # compute 'K' checksum
-    i = 0; v = 1; c = 0
+    i = 0
+    v = 1
+    c = 0
     while i < len(s):
         c = c + v * _patterns[s[i]][1]
-        i = i + 1; v = v + 1
+        i += 1
+        v += 1
         if v > 15:
             v = 1
     s.insert(0, _charsbyval[c % 47])
@@ -110,6 +117,7 @@ def _encode93(str):
 
     return ''.join(s)
 
+
 class _Code93Base(MultiWidthBarcode):
     barWidth = inch * 0.0075
     lquiet = None
@@ -117,11 +125,12 @@ class _Code93Base(MultiWidthBarcode):
     quiet = 1
     barHeight = None
     stop = 1
+
     def __init__(self, value='', **args):
 
-        if type(value) is type(1):
+        if isinstance(value, int):
             value = asNative(value)
-            
+
         for (k, v) in args.items():
             setattr(self, k, v)
 
@@ -137,25 +146,27 @@ class _Code93Base(MultiWidthBarcode):
     def decompose(self):
         dval = self.stop and [_patterns['start'][0]] or []
         dval += [_patterns[c][0] for c in self.encoded]
-        if self.stop: dval.append(_patterns['stop'][0])
+        if self.stop:
+            dval.append(_patterns['stop'][0])
         self.decomposed = ''.join(dval)
         return self.decomposed
+
 
 class Standard93(_Code93Base):
     """
     Code 93 is a Uppercase alphanumeric symbology with some punctuation.
     See Extended Code 93 for a variant that can represent the entire
     128 characrter ASCII set.
-    
+
     Options that may be passed to constructor:
 
         value (int, or numeric string. required.):
             The value to encode.
-   
+
         barWidth (float, default .0075):
             X-Dimension, or width of the smallest element
             Minumum is .0075 inch (7.5 mils).
-            
+
         barHeight (float, see default below):
             Height of the symbol.  Default is the height of the two
             bearer bars (if they exist) plus the greater of .25 inch
@@ -163,11 +174,11 @@ class Standard93(_Code93Base):
 
         quiet (bool, default 1):
             Wether to include quiet zones in the symbol.
-            
+
         lquiet (float, see default below):
             Quiet zone size to left of code, if quiet is true.
             Default is the greater of .25 inch, or 10 barWidth
-            
+
         rquiet (float, defaults as above):
             Quiet zone size to right left of code, if quiet is true.
 
@@ -202,9 +213,9 @@ class Extended93(_Code93Base):
     Extended Code 93 is a convention for encoding the entire 128 character
     set using pairs of characters to represent the characters missing in
     Standard Code 93. It is very much like Extended Code 39 in that way.
-    
+
     See Standard93 for arguments.
-    """    
+    """
 
     def validate(self):
         vval = []

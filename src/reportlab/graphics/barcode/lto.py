@@ -6,7 +6,8 @@ from reportlab.lib import colors
 from reportlab.lib.units import cm
 from string import ascii_uppercase, digits as string_digits
 
-class BaseLTOLabel(Standard39) :
+
+class BaseLTOLabel(Standard39):
     """
     Base class for LTO labels.
 
@@ -24,12 +25,13 @@ class BaseLTOLabel(Standard39) :
     CODEGAP = CODEBARWIDTH
     CODELQUIET = 10 * CODEBARWIDTH
     CODERQUIET = 10 * CODEBARWIDTH
+
     def __init__(self, prefix="",
-                       number=None,
-                       subtype="1",
-                       border=None,
-                       checksum=False,
-                       availheight=None) :
+                 number=None,
+                 subtype="1",
+                 border=None,
+                 checksum=False,
+                 availheight=None) :
         """
            Initializes an LTO label.
 
@@ -37,22 +39,22 @@ class BaseLTOLabel(Standard39) :
            number : Label's number or None. Defaults to None.
            subtype : LTO subtype string , e.g. "1" for LTO1. Defaults to "1".
            border : None, or the width of the label's border. Defaults to None.
-           checksum : Boolean indicates if checksum char has to be printed. Defaults to False.
-           availheight : Available height on the label, or None for automatic. Defaults to None.
+           checksum : Boolean indicates if checksum char has to be printed.
+               Defaults to False.
+           availheight : Available height on the label, or None for automatic.
+               Defaults to None.
         """
         self.height = max(availheight, self.CODEBARHEIGHT)
         self.border = border
-        if (len(subtype) != 1) \
-            or (subtype not in ascii_uppercase + string_digits) :
+        if (len(subtype) != 1) or (subtype not in ascii_uppercase + string_digits):
             raise ValueError("Invalid subtype '%s'" % subtype)
-        if ((not number) and (len(prefix) > 6)) \
-           or not prefix.isalnum() :
+        if ((not number) and (len(prefix) > 6)) or not prefix.isalnum():
             raise ValueError("Invalid prefix '%s'" % prefix)
         label = "%sL%s" % ((prefix + str(number or 0).zfill(6 - len(prefix)))[:6],
                            subtype)
-        if len(label) != 8 :
-            raise ValueError("Invalid set of parameters (%s, %s, %s)" \
-                                % (prefix, number, subtype))
+        if len(label) != 8:
+            raise ValueError("Invalid set of parameters (%s, %s, %s)"
+                             % (prefix, number, subtype))
         self.label = label
         Standard39.__init__(self,
                             label,
@@ -72,14 +74,15 @@ class BaseLTOLabel(Standard39) :
         if self.border :
             canvas.setLineWidth(self.border)
             canvas.roundRect(0, 0,
-                        self.LABELWIDTH,
-                        self.LABELHEIGHT,
-                        self.LABELROUND)
+                             self.LABELWIDTH,
+                             self.LABELHEIGHT,
+                             self.LABELROUND)
         Standard39.drawOn(self,
                           canvas,
                           (self.LABELWIDTH-self.CODENOMINALWIDTH)/2.0,
                           self.LABELHEIGHT-self.height)
         canvas.restoreState()
+
 
 class VerticalLTOLabel(BaseLTOLabel) :
     """
@@ -154,6 +157,7 @@ class VerticalLTOLabel(BaseLTOLabel) :
             canvas.restoreState()
         canvas.restoreState()
 
+
 def test() :
     """Test this."""
     from reportlab.pdfgen.canvas import Canvas
@@ -163,9 +167,12 @@ def test() :
     canvas.setFont("Helvetica", 30)
     (width, height) = pagesizes.A4
     canvas.drawCentredString(width/2.0, height-4*cm, "Sample LTO labels")
-    xpos = xorig = 2 * cm
-    ypos = yorig = 2 * cm
-    colwidth = 10 * cm
+
+    # xpos = xorig = 2 * cm  (xorig, yorig assigned but not used)
+    # ypos = yorig = 2 * cm
+    xpos = 2 * cm
+    ypos = 2 * cm
+    # colwidth = 10 * cm (assigned but not used)
     lineheight = 3.9 * cm
     count = 1234
     BaseLTOLabel("RL", count, "3").drawOn(canvas, xpos, ypos)
@@ -179,17 +186,18 @@ def test() :
     ypos += lineheight
     count += 1
     VerticalLTOLabel("RL", count, "3",
-                    border=0.0125).drawOn(canvas, xpos, ypos)
+                     border=0.0125).drawOn(canvas, xpos, ypos)
     ypos += lineheight
     count += 1
     VerticalLTOLabel("RL", count, "3",
-                    colored=True).drawOn(canvas, xpos, ypos)
+                     colored=True).drawOn(canvas, xpos, ypos)
     ypos += lineheight
     count += 1
     VerticalLTOLabel("RL", count, "3",
-                    border=0.0125, colored=True).drawOn(canvas, xpos, ypos)
+                     border=0.0125, colored=True).drawOn(canvas, xpos, ypos)
     canvas.showPage()
     canvas.save()
+
 
 if __name__ == "__main__" :
     test()

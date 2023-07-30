@@ -1,6 +1,8 @@
-#this code contributed by Kyle Macfarlane see
-#https://bitbucket.org/rptlab/reportlab/issues/69/implementations-of-code-128-auto-and-data
-__all__= ('ECC200datamatrix',)
+# this code contributed by Kyle Macfarlane see
+# https://bitbucket.org/rptlab/reportlab/issues/69/implementations-of-code-128-auto-and-data
+from reportlab.graphics.barcode.common import Barcode
+
+__all__ = ('ECC200DataMatrix',)
 FACTORS = {
     5: (228, 48, 15, 111, 62),
     7: (23, 68, 144, 134, 240, 92, 254),
@@ -86,16 +88,18 @@ ALOGVAL = (
     179, 75, 150, 1
 )
 
-from reportlab.graphics.barcode.common import Barcode
+
 class ECC200DataMatrix(Barcode):
     '''This code only supports a Type 12 (44x44) C40 encoded data matrix.
-    This is the size and encoding that Royal Mail wants on all mail from October 1st 2015.
-    see https://bitbucket.org/rptlab/reportlab/issues/69/implementations-of-code-128-auto-and-data
+    This is the size and encoding that Royal Mail wants on all mail from
+    October 1st 2015.
+    see https://bitbucket.org/rptlab/reportlab/issues/69
+                             /implementations-of-code-128-auto-and-data
     '''
     barWidth = 4
 
     def __init__(self, *args, **kwargs):
-        Barcode.__init__(self,*args, **kwargs)
+        Barcode.__init__(self, *args, **kwargs)
 
         # These values below are hardcoded for a Type 12 44x44 data matrix
         self.row_modules = 44
@@ -129,21 +133,21 @@ class ECC200DataMatrix(Barcode):
             else:
                 encoded.append(o - 51)
         elif o >= 0 and o <= 31:
-            encoded.append(0) # Shift to set 1
+            encoded.append(0)  # Shift to set 1
             encoded.append(o)
         elif (o >= 33 and o <= 64) or (o >= 91 and o <= 95):
-            encoded.append(1) # Shift to set 2
+            encoded.append(1)  # Shift to set 2
             if o >= 33 and o <= 64:
                 encoded.append(o - 33)
             else:
                 encoded.append(o - 69)
         elif o >= 96 and o <= 127:
-            encoded.append(2) # Shift to set 3
+            encoded.append(2)  # Shift to set 3
             encoded.append(o - 96)
         elif o >= 128 and o <= 255:
             # Extended ASCII
-            encoded.append(1) # Shift to set 2
-            encoded.append(30) # Upper shift / hibit
+            encoded.append(1)  # Shift to set 2
+            encoded.append(30)  # Upper shift / hibit
             encoded += self._encode_c40_char(chr(o - 128))
         else:
             raise Exception('Cannot encode %s (%s)' % (char, o))
@@ -157,10 +161,11 @@ class ECC200DataMatrix(Barcode):
             encoded += self._encode_c40_char(c)
 
         while len(encoded) % 3:
-            encoded.append(0) # Fake padding that makes chunking in the next step easier
+            # Fake padding that makes chunking in the next step easier
+            encoded.append(0)
 
         codewords = []
-        codewords.append(230) # Switch to C40 encoding
+        codewords.append(230)  # Switch to C40 encoding
 
         for i in range(0, len(encoded), 3):
             chunk = encoded[i:i+3]
@@ -168,14 +173,14 @@ class ECC200DataMatrix(Barcode):
             codewords.append(total // 256)
             codewords.append(total % 256)
 
-        codewords.append(254) # End of data
+        codewords.append(254)  # End of data
 
         if len(codewords) > self.cw_data:
             raise Exception('Too much data to fit into a data matrix of this size')
 
         if len(codewords) < self.cw_data:
             # Real padding
-            codewords.append(129) # Start padding
+            codewords.append(129)  # Start padding
             while len(codewords) < self.cw_data:
                 r = ((149 * (len(codewords) + 1)) % 253) + 1
                 codewords.append((129 + r) % 254)
@@ -264,7 +269,8 @@ class ECC200DataMatrix(Barcode):
     def _place_bit_corner_4(self, data):
         bits = self._get_next_bits(data)
         self._place_bit(self.row_usable_modules - 1, 0, bits[0])
-        self._place_bit(self.row_usable_modules - 1, self.col_usable_modules - 1, bits[1])
+        self._place_bit(self.row_usable_modules - 1,
+                        self.col_usable_modules - 1, bits[1])
         self._place_bit(0, self.col_usable_modules - 3, bits[2])
         self._place_bit(0, self.col_usable_modules - 2, bits[3])
         self._place_bit(0, self.col_usable_modules - 1, bits[4])
@@ -425,7 +431,7 @@ class ECC200DataMatrix(Barcode):
         wrapped = self._wrap_data_regions_with_finders(data_regions)
         self.encoded = self._merge_data_regions(wrapped)
 
-        self.encoded.reverse() # Helpful since PDFs start at bottom left corner
+        self.encoded.reverse()  # Helpful since PDFs start at bottom left corner
 
         return self.encoded
 

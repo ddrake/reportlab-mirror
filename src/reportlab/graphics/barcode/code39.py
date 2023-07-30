@@ -94,12 +94,15 @@ _extchrs = _stdchrs + ascii_lowercase + \
     "\020\021\022\023\024\025\026\027\030\031\032\033\034\035\036\037" + \
     "*!'#&\"(),:;<=>?@[\\]^_`{|}~\177"
 
+
 def _encode39(value, cksum, stop):
     v = sum([_patterns[c][1] for c in value]) % 43
     if cksum:
         value += _stdchrs[v]
-    if stop: value = '*'+value+'*'
+    if stop:
+        value = '*'+value+'*'
     return value
+
 
 class _Code39Base(Barcode):
     barWidth = inch * 0.0075
@@ -112,7 +115,8 @@ class _Code39Base(Barcode):
     checksum = 1
     bearers = 0.0
     stop = 1
-    def __init__(self, value = "", **args):
+
+    def __init__(self, value="", **args):
         value = asNative(value)
         for k, v in args.items():
             setattr(self, k, v)
@@ -135,6 +139,7 @@ class _Code39Base(Barcode):
 
     def _humanText(self):
         return self.stop and self.encoded[1:-1] or self.encoded
+
 
 class Standard39(_Code39Base):
     """
@@ -207,6 +212,7 @@ class Standard39(_Code39Base):
         self.encoded = _encode39(self.validated, self.checksum, self.stop)
         return self.encoded
 
+
 class Extended39(_Code39Base):
     """
     Extended Code 39 is a convention for encoding additional characters
@@ -240,5 +246,5 @@ class Extended39(_Code39Base):
                 self.encoded = self.encoded + c
             else:
                 raise ValueError
-        self.encoded = _encode39(self.encoded, self.checksum,self.stop)
+        self.encoded = _encode39(self.encoded, self.checksum, self.stop)
         return self.encoded
