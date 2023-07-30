@@ -271,7 +271,7 @@ class AcroForm(PDFObject):
         elif shape == 'circle':
             # don't assign a lambda expression, use a def
             def cas(_r, **_casKwds):
-                self.circleArcStream(size, _r, **_casKwds)
+                return self.circleArcStream(size, _r, **_casKwds)
             r = size*0.5
             streamFill = self.streamFillColor(fillColor)  # noqa: F841
             stream('q 1 g 1 G %(streamFill)s')
