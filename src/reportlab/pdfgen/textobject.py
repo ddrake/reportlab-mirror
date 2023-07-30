@@ -201,7 +201,7 @@ class PDFTextObject(_PDFColorSetter):
         self._doc = self._canvas._doc
         self._colorsUsed = self._canvas._colorsUsed
         self._enforceColorSpace = getattr(canvas, '_enforceColorSpace', None)
-        # font = pdfmetrics.getFont(self._fontname)  (set but not used)
+        pdfmetrics.getFont(self._fontname)  # returns font; not used + side-affects
         self._curSubset = -1
         self.direction = direction
         self.setTextOrigin(x, y)
