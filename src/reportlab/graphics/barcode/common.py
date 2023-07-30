@@ -34,6 +34,7 @@ from reportlab.platypus.flowables import Flowable
 from reportlab.lib.units import inch
 from string import ascii_lowercase, ascii_uppercase, digits as string_digits
 
+
 class Barcode(Flowable):
     """Abstract Base for barcodes. Includes implementations of
     some methods suitable for the more primitive barcode types"""
@@ -45,13 +46,12 @@ class Barcode(Flowable):
     def _humanText(self):
         return self.encoded
 
-    def __init__(self, value='',**kwd):
+    def __init__(self, value='', **kwd):
         self.value = str(value)
 
         self._setKeywords(**kwd)
         if not hasattr(self, 'gap'):
             self.gap = None
-
 
     def _calculate(self):
         self.validate()
@@ -59,7 +59,7 @@ class Barcode(Flowable):
         self.decompose()
         self.computeSize()
 
-    def _setKeywords(self,**kwd):
+    def _setKeywords(self, **kwd):
         for (k, v) in kwd.items():
             setattr(self, k, v)
 
@@ -77,7 +77,7 @@ class Barcode(Flowable):
         barWidth = self.barWidth
         wx = barWidth * self.ratio
 
-        if self.gap == None:
+        if self.gap is None:
             self.gap = barWidth
 
         w = 0.0
@@ -87,7 +87,7 @@ class Barcode(Flowable):
                 w = w + barWidth
             elif c in 'SB':
                 w = w + wx
-            else: # 'i'
+            else:  # 'i'
                 w = w + self.gap
 
         if self.barHeight is None:
@@ -98,7 +98,6 @@ class Barcode(Flowable):
 
         if self.quiet:
             w += self.lquiet + self.rquiet
-
 
         self._height = self.barHeight
         self._width = w
@@ -138,12 +137,15 @@ class Barcode(Flowable):
                 left = left + wx
 
         if self.bearers:
-            if getattr(self,'bearerBox', None):
+            if getattr(self, 'bearerBox', None):
                 canv = self.canv
-                if hasattr(canv,'_Gadd'):
-                    #this is a widget rect takes other arguments
-                    canv.rect(bb, bb, self.width, self.barHeight-b,
-                            strokeWidth=b, strokeColor=self.barFillColor or self.barStrokeColor, fillColor=None)
+                if hasattr(canv, '_Gadd'):
+                    # this is a widget rect takes other arguments
+                    canv.rect(
+                        bb, bb, self.width, self.barHeight-b,
+                        strokeWidth=b,
+                        strokeColor=self.barFillColor or self.barStrokeColor,
+                        fillColor=None)
                 else:
                     canv.saveState()
                     canv.setLineWidth(b)
@@ -158,33 +160,37 @@ class Barcode(Flowable):
 
     def drawHumanReadable(self):
         if self.humanReadable:
-            #we have text
+            # we have text
             from reportlab.pdfbase.pdfmetrics import getAscent, stringWidth
             s = str(self._humanText())
             fontSize = self.fontSize
             fontName = self.fontName
-            w = stringWidth(s,fontName,fontSize)
+            w = stringWidth(s, fontName, fontSize)
             width = self._width
             if self.quiet:
                 width -= self.lquiet+self.rquiet
                 x = self.lquiet
             else:
                 x = 0
-            if w>width: fontSize *= width/float(w)
+            if w > width:
+                fontSize *= width/float(w)
             y = 1.07*getAscent(fontName)*fontSize/1000.
-            self.annotate(x+width/2.,-y,s,fontName,fontSize)
+            self.annotate(x+width/2., -y, s, fontName, fontSize)
 
     def rect(self, x, y, w, h):
         self.canv.rect(x, y, w, h, stroke=0, fill=1)
 
-    def annotate(self,x,y,text,fontName,fontSize,anchor='middle'):
+    def annotate(self, x, y, text, fontName, fontSize, anchor='middle'):
         canv = self.canv
         canv.saveState()
-        canv.setFont(self.fontName,fontSize)
-        if anchor=='middle': func = 'drawCentredString'
-        elif anchor=='end': func = 'drawRightString'
-        else: func = 'drawString'
-        getattr(canv,func)(x,y,text)
+        canv.setFont(self.fontName, fontSize)
+        if anchor == 'middle':
+            func = 'drawCentredString'
+        elif anchor == 'end':
+            func = 'drawRightString'
+        else:
+            func = 'drawString'
+        getattr(canv, func)(x, y, text)
         canv.restoreState()
 
     def _checkVal(self, name, v, allowed):
@@ -192,6 +198,7 @@ class Barcode(Flowable):
             raise ValueError('%s attribute %s is invalid %r\nnot in allowed %r' % (
                 self.__class__.__name__, name, v, allowed))
         return v
+
 
 class MultiWidthBarcode(Barcode):
     """Base for variable-bar-width codes like Code93 and Code128"""
@@ -234,6 +241,7 @@ class MultiWidthBarcode(Barcode):
                 self.rect(left, 0, w, self.barHeight)
                 left += w
         self.drawHumanReadable()
+
 
 class I2of5(Barcode):
     """
@@ -326,7 +334,7 @@ class I2of5(Barcode):
 
     def __init__(self, value='', **args):
 
-        if type(value) == type(1):
+        if isinstance(value, int):
             value = str(value)
 
         for k, v in args.items():
@@ -357,13 +365,14 @@ class I2of5(Barcode):
         cs = self.checksum
         c = len(s)
 
-        #ensure len(result)%2 == 0, checksum included
+        # ensure len(result)%2 == 0, checksum included
         if ((c % 2 == 0) and cs) or ((c % 2 == 1) and not cs):
             s = '0' + s
             c += 1
 
         if cs:
-            c = 3*sum([int(s[i]) for i in range(0,c,2)])+sum([int(s[i]) for i in range(1,c,2)])
+            c = (3*sum([int(s[i]) for i in range(0, c, 2)]) +
+                 sum([int(s[i]) for i in range(1, c, 2)]))
             s += str((10 - c) % 10)
 
         self.encoded = s
@@ -379,9 +388,11 @@ class I2of5(Barcode):
             for i in range(0, len(b)):
                 a(b[i] + s[i])
 
-        if self.stop: a(self.patterns['stop'])
+        if self.stop:
+            a(self.patterns['stop'])
         self.decomposed = ''.join(dval)
         return self.decomposed
+
 
 class MSI(Barcode):
     """
@@ -451,7 +462,7 @@ class MSI(Barcode):
 
     def __init__(self, value="", **args):
 
-        if type(value) == type(1):
+        if isinstance(value, int):
             value = str(value)
 
         for k, v in args.items():
@@ -497,11 +508,13 @@ class MSI(Barcode):
         self.encoded = s
 
     def decompose(self):
-        dval = self.stop and [self.patterns['start']] or [] 
+        dval = self.stop and [self.patterns['start']] or []
         dval += [self.patterns[c] for c in self.encoded]
-        if self.stop: dval.append(self.patterns['stop'])
+        if self.stop:
+            dval.append(self.patterns['stop'])
         self.decomposed = ''.join(dval)
         return self.decomposed
+
 
 class Codabar(Barcode):
     """
@@ -579,7 +592,7 @@ class Codabar(Barcode):
     stop = 1
     barHeight = None
     barWidth = inch * 0.0065
-    ratio = 2.0 # XXX ?
+    ratio = 2.0  # XXX ?
     checksum = 0
     bearers = 0.0
     quiet = 1
@@ -587,7 +600,7 @@ class Codabar(Barcode):
     rquiet = None
 
     def __init__(self, value='', **args):
-        if type(value) == type(1):
+        if isinstance(value, int):
             value = str(value)
 
         for k, v in args.items():
@@ -636,6 +649,7 @@ class Codabar(Barcode):
         dval = ''.join([self.patterns[c]+'i' for c in self.encoded])
         self.decomposed = dval[:-1]
         return self.decomposed
+
 
 class Code11(Barcode):
     """
@@ -688,7 +702,7 @@ class Code11(Barcode):
         '0' : 'bsbsB',        '1' : 'BsbsB',        '2' : 'bSbsB',
         '3' : 'BSbsb',        '4' : 'bsBsB',        '5' : 'BsBsb',
         '6' : 'bSBsb',        '7' : 'bsbSB',        '8' : 'BsbSb',
-        '9' : 'Bsbsb',        '-' : 'bsBsb',        'S' : 'bsBSb' # Start/Stop
+        '9' : 'Bsbsb',        '-' : 'bsBsb',        'S' : 'bsBSb'   # Start/Stop
     }
 
     values = {
@@ -700,14 +714,15 @@ class Code11(Barcode):
     stop = 1
     barHeight = None
     barWidth = inch * 0.0075
-    ratio = 2.2 # XXX ?
-    checksum = -1 # Auto
+    ratio = 2.2  # XXX ?
+    checksum = -1  # Auto
     bearers = 0.0
     quiet = 1
     lquiet = None
     rquiet = None
+
     def __init__(self, value='', **args):
-        if type(value) == type(1):
+        if isinstance(value, int):
             value = str(value)
 
         for k, v in args.items():
@@ -736,7 +751,7 @@ class Code11(Barcode):
         self.validated = vval
         return vval
 
-    def _addCSD(self,s,m):
+    def _addCSD(self, s, m):
         # compute first checksum
         i = c = 0
         v = 1
@@ -745,7 +760,7 @@ class Code11(Barcode):
             c += v * V[s[-(i+1)]]
             i += 1
             v += 1
-            if v==m:
+            if v == m:
                 v = 1
         return s+self.chars[c % 11]
 
@@ -753,11 +768,13 @@ class Code11(Barcode):
         s = self.validated
 
         tcs = self.checksum
-        if tcs<0:
-            self.checksum = tcs = 1+int(len(s)>10)
+        if tcs < 0:
+            self.checksum = tcs = 1+int(len(s) > 10)
 
-        if tcs > 0: s = self._addCSD(s,11)
-        if tcs > 1: s = self._addCSD(s,10)
+        if tcs > 0:
+            s = self._addCSD(s, 11)
+        if tcs > 1:
+            s = self._addCSD(s, 10)
 
         self.encoded = self.stop and ('S' + s + 'S') or s
 

@@ -74,4 +74,4 @@ _ozC_patterns = {
     "8" : ".,'",    "9" : ".,,",    " " : "||.",    "#" : "|'.",
 }
 
-#http://www.auspost.com.au/futurepost/
+# http://www.auspost.com.au/futurepost/

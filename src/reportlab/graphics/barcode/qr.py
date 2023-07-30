@@ -30,10 +30,14 @@ from reportlab.lib.units import mm
 from reportlab.lib.utils import asUnicodeEx, isUnicode
 from reportlab.graphics.barcode import qrencoder
 
+
 class isLevel(Validator):
     def test(self, x):
         return x in ['L', 'M', 'Q', 'H']
+
+
 isLevel = isLevel()
+
 
 class isUnicodeOrQRList(Validator):
     def _test(self, x):
@@ -53,29 +57,37 @@ class isUnicodeOrQRList(Validator):
             return asUnicodeEx(x)
         except UnicodeError:
             raise ValueError("Can't convert to unicode: %r" % x)
+
+
 isUnicodeOrQRList = isUnicodeOrQRList()
+
 
 class SRect(Rect):
     def __init__(self, x, y, width, height, fillColor=colors.black):
         Rect.__init__(self, x, y, width, height, fillColor=fillColor,
                       strokeColor=None, strokeWidth=0)
 
+
 class QrCodeWidget(Widget):
     codeName = "QR"
     _attrMap = AttrMap(
-        BASE = Widget,
-        value = AttrMapValue(isUnicodeOrQRList, desc='QRCode data'),
-        x = AttrMapValue(isNumber, desc='x-coord'),
-        y = AttrMapValue(isNumber, desc='y-coord'),
-        barFillColor = AttrMapValue(isColor, desc='bar color'),
-        barWidth = AttrMapValue(isNumber, desc='Width of bars.'), # maybe should be named just width?
-        barHeight = AttrMapValue(isNumber, desc='Height of bars.'), # maybe should be named just height?
-        barBorder = AttrMapValue(isNumber, desc='Width of QR border.'), # maybe should be named qrBorder?
-        barLevel = AttrMapValue(isLevel, desc='QR Code level.'), # maybe should be named qrLevel
-        qrVersion = AttrMapValue(isNumberOrNone, desc='QR Code version. None for auto'),
+        BASE=Widget,
+        value=AttrMapValue(isUnicodeOrQRList, desc='QRCode data'),
+        x=AttrMapValue(isNumber, desc='x-coord'),
+        y=AttrMapValue(isNumber, desc='y-coord'),
+        barFillColor=AttrMapValue(isColor, desc='bar color'),
+        # maybe should be named just width?
+        barWidth=AttrMapValue(isNumber, desc='Width of bars.'),
+        # maybe should be named just height?
+        barHeight=AttrMapValue(isNumber, desc='Height of bars.'),
+        # maybe should be named qrBorder?
+        barBorder=AttrMapValue(isNumber, desc='Width of QR border.'),
+        # maybe should be named qrLevel
+        barLevel=AttrMapValue(isLevel, desc='QR Code level.'),
+        qrVersion=AttrMapValue(isNumberOrNone, desc='QR Code version. None for auto'),
         # Below are ignored, they make no sense
-        barStrokeWidth = AttrMapValue(isNumber, desc='Width of bar borders.'),
-        barStrokeColor = AttrMapValue(isColor, desc='Color of bar borders.'),
+        barStrokeWidth=AttrMapValue(isNumber, desc='Width of bar borders.'),
+        barStrokeColor=AttrMapValue(isColor, desc='Color of bar borders.'),
         )
     x = 0
     y = 0
@@ -136,8 +148,9 @@ class QrCodeWidget(Widget):
                 if isDark:
                     x = (c + border) * boxsize
                     y = (r + border + 1) * boxsize
-                    s = SRect(offsetX + x, offsetY + height - y, count * boxsize, boxsize,
-                            fillColor=color)
+                    s = SRect(offsetX + x, offsetY + height - y,
+                              count * boxsize, boxsize,
+                              fillColor=color)
                     g.add(s)
                 c += count
 
