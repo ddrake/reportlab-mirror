@@ -271,7 +271,7 @@ class AcroForm(PDFObject):
         elif shape == 'circle':
             # don't assign a lambda expression, use a def
             def cas(_r, **_casKwds):
-                self.circleArcStream(size, _r, **_casKwds)
+                return self.circleArcStream(size, _r, **_casKwds)
             r = size*0.5
             streamFill = self.streamFillColor(fillColor)  # noqa: F841
             stream('q 1 g 1 G %(streamFill)s')
@@ -314,8 +314,8 @@ class AcroForm(PDFObject):
                     stream(cas(r-_3bwh, rotated=True, arcs=a1))
                     stream('S Q')
         if value == 'Yes':
-            # textFillColor = self.streamFillColor(textColor) (assigned not used)
-            # textStrokeColor = self.streamStrokeColor(textColor) (assigned not used)
+            textFillColor = self.streamFillColor(textColor)  # noqa
+            textStrokeColor = self.streamStrokeColor(textColor)  # noqa
             stream('q %(textFillColor)s %(textStrokeColor)s')
             cbm = cbmarks[buttonStyle]
             if shape == 'circle' and buttonStyle == 'circle':
@@ -340,11 +340,10 @@ class AcroForm(PDFObject):
         size *= f
         hsize *= f
         r *= f
-        # cp = fp_str(0.55231 * r) (assigned but not used)
+        cp = fp_str(0.55231 * r) # noqa
         r = fp_str(r)
         hsize = fp_str(hsize)
-        # assigned but not used
-        # mx = '0.7071 0.7071 -0.7071 0.7071' if rotated else '1 0 0 1'
+        mx = '0.7071 0.7071 -0.7071 0.7071' if rotated else '1 0 0 1'  # noqa
         R('%(mx)s %(hsize)s %(hsize)s cm')
         if 0 in arcs:
             if rlen() == 1:
@@ -371,8 +370,8 @@ class AcroForm(PDFObject):
         w = float(stringWidth(c, 'ZapfDingbats', fs))
         if w > W:
             fs *= W/w
-        # dx = ds + 0.5*(W-w)  (assigned but not used)
-        # dy = 0  (assigned but not used)
+        dx = ds + 0.5*(W-w)  # noqa
+        dy = 0  # noqa
         return ('BT %(iFontName)s %(fs)s Tf %(dx)s %(dy)s Td %(fs)s TL (%(c)s) Tj ET' %
                 vars())
 
