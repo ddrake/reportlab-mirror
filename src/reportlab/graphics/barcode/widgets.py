@@ -100,10 +100,11 @@ class _BarcodeWidget(PlotArea):
                           fontSize=fontSize, textAnchor=anchor,
                           fillColor=self.textColor))
 
-def _BCW(doc,codeName,attrMap,mod,value,**kwds):
+
+def _BCW(doc, codeName, attrMap, mod, value, **kwds):
     """factory for Barcode Widgets"""
-    # _pre_init = kwds.pop('_pre_init','')  (assigned but not used)
-    # _methods = kwds.pop('_methods','')    (assigned but not used)
+    _pre_init = kwds.pop('_pre_init','') # noqa (some wizardry I don't get yet...)
+    _methods = kwds.pop('_methods','')  # noqa
     name = 'Barcode'+codeName
     ns = vars().copy()
     code = 'from %s import %s' % (mod, codeName)
