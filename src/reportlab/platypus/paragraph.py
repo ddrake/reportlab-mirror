@@ -2170,7 +2170,7 @@ class Paragraph(Flowable):
                 ll = max(leading, 1.2*style.fontSize)
             elif autoLeading == 'min':
                 ll = 1.2*style.fontSize
-            s = int(availHeight/float(l))
+            s = int(availHeight/float(ll))
             height = s*ll
 
         allowOrphans = getattr(self, 'allowOrphans',
