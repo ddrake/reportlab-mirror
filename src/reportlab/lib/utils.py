@@ -22,8 +22,11 @@ import types
 from urllib.parse import unquote, urlparse
 from urllib.request import urlopen
 
-# from reportlab.lib.rltempfile import get_rl_tempfile, get_rl_tempdir
-# from . rl_afe_eval import rl_safe_exec, safer_globals, rl_extended_literal_eval
+# These are not used directly here, but other libraries import them from here.
+# My gut tells me this is an evil practice that should be eradicated...
+from reportlab.lib.rltempfile import get_rl_tempfile, get_rl_tempdir  # noqa
+from . rl_safe_eval import rl_safe_exec, safer_globals, rl_extended_literal_eval  # noqa
+
 from . rl_safe_eval import rl_safe_eval
 from PIL import Image
 
