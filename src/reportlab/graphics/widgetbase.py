@@ -8,11 +8,11 @@ __version__ = '3.3.0'
 from reportlab.graphics import shapes
 from reportlab import rl_config
 from reportlab.lib import colors
-from reportlab.lib.validators import (validateSetattr, isNumber, isString,
+from reportlab.lib.validators import (isNumber, isString,
                                       isListOfNumbersOrNone, isColorOrNone, OneOf,
                                       isListOfShapes, isValidChild, isNumberOrNone,
                                       NotSetOr, isBoolean, SequenceOf)
-from reportlab.lib.attrmap import (AttrMap, AttrMapValue)
+from reportlab.lib.attrmap import (AttrMap, AttrMapValue, validateSetattr)
 from weakref import ref as weakref_ref
 
 
