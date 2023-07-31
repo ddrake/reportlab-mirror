@@ -18,6 +18,7 @@ changed
 
 from io import BytesIO
 import os
+import sys
 from reportlab.graphics.shapes import (Path, numericXShift)
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -407,7 +408,6 @@ def test(outDir='pdfout', shout=False):
 
 if __name__ == '__main__':
     test(shout=True)
-    import sys
     if len(sys.argv) > 1:
         outdir = sys.argv[1]
     else:

@@ -763,10 +763,10 @@ class TTFontFile(TTFontParser):
         if fmt in (13, 12, 10, 8):
             self.skip(2)    # padding
             length = self.read_ulong()
-            # lang = self.read_ulong() (set but not used)
+            self.read_ulong()   # lang (not used)
         else:
             length = self.read_ushort()
-            # lang = self.read_ushort() (set but not used)
+            self.read_ushort()  # lang (not used)
         if fmt == 0:
             T = [self.read_uint8() for i in range(length-6)]
             # undefined name table (was self.table intended?)
@@ -1385,8 +1385,7 @@ class TTFont:
             pdfFont.FontDescriptor = self.face.addSubsetObjects(doc, baseFontName,
                                                                 subset)
 
-            # link it in
-            # ref = doc.Reference(pdfFont, internalName)  (set but not used)
+            doc.Reference(pdfFont, internalName)  # returns ref (not used)
             fontDict = doc.idToObject['BasicFonts'].dict
             fontDict[internalName] = pdfFont
         del self.state[doc]

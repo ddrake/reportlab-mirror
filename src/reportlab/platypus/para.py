@@ -441,7 +441,8 @@ class paragraphEngine:
                     line.append(opcode)
                 elif indicator == "rise":
                     (i, rise) = opcode
-                    # newrise = self.rise = self.rise+rise (newrise set but not used)
+                    # newrise = self.rise = self.rise+rise  (newrise set but not used)
+                    self.rise = self.rise+rise
                     line.append(opcode)
                 elif indicator == "align":
                     (i, alignment) = opcode
@@ -1409,7 +1410,9 @@ class Para(Flowable):
             for x in formattedProgram:
                 print(x)
             print("-"*44)
-        # laststate = p.runOpCodes(formattedProgram, c, t) (assigned but not used)
+        # laststate = p.runOpCodes(formattedProgram, c, t)
+        # returns laststate (not used), but runOpCodes may have side affects
+        p.runOpCodes(formattedProgram, c, t)
         # print laststate["x"], laststate["y"]
         c.drawText(t)
 

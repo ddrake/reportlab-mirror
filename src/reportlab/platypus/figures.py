@@ -161,7 +161,8 @@ class Figure(Flowable):
 
 def drawPage(canvas, x, y, width, height):
     # draws something which looks like a page
-    # pth = canvas.beginPath()  (assigned but not used)
+    # pth = canvas.beginPath()  (pth not used, but side affects needed)
+    canvas.beginPath()
     corner = 0.05*width
 
     # shaded backdrop offset a little
@@ -361,12 +362,15 @@ if _hasPageCatcher:
                 restorePath = self.dirname + os.sep + self.filename
                 # does the form file exist?  if not, generate it.
 
-                # formFileName set but not used
-                # formFileName = self.getFormName(restorePath, self.pageNo) + '.frm'
+                formFileName = self.getFormName(restorePath, self.pageNo) + '.frm'
+                self.getFormName(restorePath, self.pageNo)
                 if self.needsProcessing(restorePath, self.pageNo):
                     # print 'preprocessing PDF %s page %s' % (restorePath, self.pageNo)
                     self.processPDF(restorePath, self.pageNo)
-                # names = restoreForms(formFileName, self.canv) (set but not used)
+                # names = restoreForms(formFileName, self.canv)
+                # names set but not used but may be side affects
+                # bug? restore forms not defined (missing import from rlextra?)
+                restoreForms(formFileName, self.canv)  # noqa
             self.canv.scale(self._scaleFactor, self._scaleFactor)
             self.canv.doForm(self.formName)
             self.canv.restoreState()

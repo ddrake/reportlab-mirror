@@ -11,7 +11,7 @@ from reportlab.lib.validators import (isNumber, isColorOrNone, isListOfNumbersOr
                                       isStringOrNone, isBoolean, SequenceOf,
                                       isNumberOrNone, isString, isAnything)
 from reportlab.lib.attrmap import AttrMap, AttrMapValue
-from reportlab.lib.utils import flatten, isStr, str2seconds, seconds2str
+from reportlab.lib.utils import flatten, isStr
 from reportlab.graphics.shapes import (Drawing, Group, Rect, PolyLine, Polygon,
                                        _SetKeyWordArgs)
 from reportlab.graphics.widgetbase import (TypedPropertyCollection, PropHolder,
@@ -25,7 +25,7 @@ from reportlab.graphics.widgets.markers import uSymbol2Symbol, makeMarker
 from reportlab.graphics.widgets.grids import Grid, DoubleGrid, ShadedPolygon
 from reportlab.pdfbase.pdfmetrics import stringWidth, getFont
 from reportlab.graphics.charts.areas import PlotArea
-from .utils import FillPairedData
+from .utils import FillPairedData,  str2seconds, seconds2str
 
 
 # This might be moved again from here...

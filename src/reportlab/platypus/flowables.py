@@ -1590,7 +1590,8 @@ class _ExtendBG(NullDraw):
         fbw = frame._width - fbgl - bg.right
         fbx = frame._x1 - fbgl
         canv = self.canv
-        # pn = canv.getPageNumber() (set but not used)
+        # pn = canv.getPageNumber()  (pn set but not used but may need side affects)
+        canv.getPageNumber()
         bg.render(canv, frame, fbx, fby, fbw, fbh)
 
 
