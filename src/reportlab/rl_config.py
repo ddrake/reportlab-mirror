@@ -135,7 +135,7 @@ def _startUp():
             if isinstance(v, (int, float)):
                 conv = type(v)
             elif k == 'defaultPageSize':
-                def conf(v, M=pagesizes):
+                def conv(v, M=pagesizes):
                     return getattr(M, v)
             elif k in ('trustedHosts', 'trustedSchemes'):
                 def conv(v):
