@@ -24,9 +24,13 @@ from reportlab.lib.validators import (NoneOr, isNumberInRange, isTransform,
                                       isListOfNumbers, isColorOrNone, EitherOr,
                                       isString)
 from reportlab.lib.utils import isSeq, asBytes
+# not explicitly needed here, but tests import it from here (TODO: fix this)
+from reportlab.lib.utils import isStr  # noqa
 from reportlab.lib.attrmap import AttrMap, validateSetattr, AttrMapValue
 from . transform import (zTransformPoints, rotate, mmult, translate, skewX, skewY,
                          scale, transformPoint)
+# not explicitly needed here, but other modules import them from here (TODO: fix this)
+from . transform import (transformPoints, inverse, nullTransform, zTransformPoint)  # noqa
 from reportlab.lib.rl_accel import fp_str
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.fonts import tt2ps
