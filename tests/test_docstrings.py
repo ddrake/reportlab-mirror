@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 
 """This is a test on a package level that find all modules,
 classes, methods and functions that do not have a doc string
@@ -9,40 +9,58 @@ and lists them in individual log files.
 Currently, methods with leading and trailing double underscores
 are skipped.
 """
-from reportlab.lib.testutils import setOutDir,SecureTestCase, GlobDirectoryWalker, outputfile, printLocation
-setOutDir(__name__)
-import os, sys, glob, re, unittest, inspect
-import reportlab
+from reportlab.lib.testutils import (setOutDir, SecureTestCase, outputfile,
+                                     printLocation)
+import os
+import sys
+# import glob
+import re
+import unittest
+import inspect
+# import reportlab
 from reportlab.lib.utils import rl_exec, isPyPy
+from pkgutil import iter_modules
+
+setOutDir(__name__)
+
 
 def typ2is(typ):
-    return getattr(inspect,'is'+typ)
+    return getattr(inspect, 'is'+typ)
 
-_typ2key={
-        'module':lambda x: (x[0],getattr(x[1],'__name__',''),getattr(x[1],'__path__',getattr(x,'__file__',''))),
-        'class':lambda x: (x[0],getattr(x[1],'__name__',''),getattr(x[1],'__module__','')),
-        'method':lambda x: (x[0],getattr(x[1],'__name__',''),getattr(x[1],'__module__','')),
-        'function':lambda x: (x[0],getattr(x[1],'__name__',''),'???' if isPyPy else x[1].__code__.co_filename),
-        }
+
+_typ2key = {
+    'module': lambda x: (x[0], getattr(x[1], '__name__', ''),
+                         getattr(x[1], '__path__', getattr(x, '__file__', ''))),
+    'class': lambda x: (x[0], getattr(x[1], '__name__', ''),
+                        getattr(x[1], '__module__', '')),
+    'method': lambda x: (x[0], getattr(x[1], '__name__', ''),
+                         getattr(x[1], '__module__', '')),
+    'function': lambda x: (x[0], getattr(x[1], '__name__', ''),
+                           '???' if isPyPy else x[1].__code__.co_filename),
+}
+
+
 def typ2key(typ):
     return _typ2key[typ]
 
+
 def obj2typ(obj):
-    for typ in ('function','module','class','method'):
-        if typ2is(typ)(obj): return typ
+    for typ in ('function', 'module', 'class', 'method'):
+        if typ2is(typ)(obj):
+            return typ
     return None
 
 
 def getClass(obj):
     try:
         return obj.__self__.__class__
-    except:
+    except Exception:
         try:
             return obj.im_class
-        except:
+        except Exception:
             return None
 
-from pkgutil import iter_modules
+
 def walk_packages_ex(path=None, prefix='', onerror=None, cond=None):
     def seen(p, m={}):
         if p in m:
@@ -50,7 +68,8 @@ def walk_packages_ex(path=None, prefix='', onerror=None, cond=None):
         m[p] = True
 
     for importer, name, ispkg in iter_modules(path, prefix):
-        if cond and not cond(importer,name,ispkg): continue
+        if cond and not cond(importer, name, ispkg):
+            continue
         yield importer, name, ispkg
 
         if ispkg:
@@ -73,42 +92,51 @@ def walk_packages_ex(path=None, prefix='', onerror=None, cond=None):
                 for item in walk_packages_ex(path, name+'.', onerror, cond):
                     yield item
 
-def rl_module(i,name,pkg):
-    return name=='reportlab' or name.startswith('reportlab.')
+
+def rl_module(i, name, pkg):
+    return name == 'reportlab' or name.startswith('reportlab.')
+
 
 rl_modules = None
+
+
 def getRLModules():
     "Get a list of all objects defined *somewhere* in a package."
     global rl_modules
     if rl_modules is None:
         rl_modules = []
-        for _,name,_ in walk_packages_ex(cond=rl_module):
+        for _, name, _ in walk_packages_ex(cond=rl_module):
             rl_modules.append(name)
     return rl_modules
 
-def getObjects(objects,lookup,mName,modBn,tobj):
+
+def getObjects(objects, lookup, mName, modBn, tobj):
     ttyp = obj2typ(tobj)
     for n in dir(tobj):
-        obj = getattr(tobj,n,None)
+        obj = getattr(tobj, n, None)
         try:
-            if obj in lookup: continue
-        except:
+            if obj in lookup:
+                continue
+        except Exception:
             continue
         typ = obj2typ(obj)
-        if typ in ('function','method'):
+        if typ in ('function', 'method'):
             try:
-                cond = not isPyPy and os.path.splitext(obj.__code__.co_filename)[0]==modBn
-            except:
+                cond = (not isPyPy and
+                        os.path.splitext(obj.__code__.co_filename)[0] == modBn)
+            except Exception:
                 pass
             else:
                 if cond:
                     lookup[obj] = 1
-                    objects.setdefault(typ if typ=='function' and ttyp=='module' else 'method',[]).append((mName,obj))
-        elif typ=='class':
-            if obj.__module__==mName:
+                    objects.setdefault(typ if typ == 'function' and ttyp == 'module'
+                                       else 'method', []).append((mName, obj))
+        elif typ == 'class':
+            if obj.__module__ == mName:
                 lookup[obj] = 1
-                objects.setdefault(typ,[]).append((mName,obj))
-                getObjects(objects,lookup,mName,modBn,obj)
+                objects.setdefault(typ, []).append((mName, obj))
+                getObjects(objects, lookup, mName, modBn, obj)
+
 
 def getModuleObjects(modules):
     objects = {}
@@ -116,18 +144,20 @@ def getModuleObjects(modules):
     for mName in modules:
         try:
             NS = {}
-            rl_exec("import %s as module" % mName,NS)
+            rl_exec("import %s as module" % mName, NS)
         except ImportError:
             continue
         else:
             module = NS['module']
-        if module in lookup: continue
+        if module in lookup:
+            continue
 
         lookup[module] = 1
-        objects.setdefault('module',[]).append((mName, module))
+        objects.setdefault('module', []).append((mName, module))
         modBn = os.path.splitext(module.__file__)[0]
-        getObjects(objects,lookup,mName,modBn,module)
+        getObjects(objects, lookup, mName, modBn, module)
     return objects
+
 
 class DocstringTestCase(SecureTestCase):
     "Testing if objects in the ReportLab package have docstrings."
@@ -140,13 +170,13 @@ class DocstringTestCase(SecureTestCase):
     def _writeLogFile(self, typ):
         "Write log file for different kind of documentable objects."
 
-        objects = self.objects.get(typ,[])
+        objects = self.objects.get(typ, [])
         objects.sort(key=typ2key(typ))
 
-        expl = {'function':'functions',
-                'class':'classes',
-                'method':'methods',
-                'module':'modules'}[typ]
+        expl = {'function': 'functions',
+                'class': 'classes',
+                'method': 'methods',
+                'module': 'modules'}[typ]
 
         path = outputfile("test_docstrings-%s.log" % expl)
         file = open(path, 'w')
@@ -165,9 +195,16 @@ class DocstringTestCase(SecureTestCase):
                 if typ == 'function':
                     lines.append("%s.%s\n" % (name, obj.__name__))
                 elif typ == 'class':
-                    lines.append("%s.%s\n" % (obj.__module__, getattr(obj,'__qualname__',getattr(obj,'__name__','[unknown __name__]'))))
+                    lines.append("%s.%s\n" %
+                                 (obj.__module__,
+                                  getattr(obj, '__qualname__',
+                                          getattr(obj, '__name__',
+                                                  '[unknown __name__]'))))
                 else:
-                    lines.append("%s\n" % (getattr(obj,'__qualname__',getattr(obj,'__name__','[unknown __name__]'))))
+                    lines.append("%s\n" %
+                                 (getattr(obj, '__qualname__',
+                                          getattr(obj, '__name__',
+                                                  '[unknown __name__]'))))
 
         lines.sort()
         for line in lines:
@@ -191,13 +228,15 @@ class DocstringTestCase(SecureTestCase):
         "Test if modules have a doc string."
         self._writeLogFile('module')
 
+
 def makeSuite():
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()
     suite.addTest(loader.loadTestsFromTestCase(DocstringTestCase))
     return suite
 
-#noruntests
+
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

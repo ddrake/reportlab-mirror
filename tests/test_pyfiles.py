@@ -1,13 +1,18 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-__version__='3.3.0'
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+__version__ = '3.3.0'
 """Tests performed on all Python source files of the ReportLab distribution.
 """
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, SecureTestCase, GlobDirectoryWalker, outputfile, printLocation
-setOutDir(__name__)
-import os, sys, string, fnmatch, re
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, SecureTestCase,
+                                     GlobDirectoryWalker, outputfile, printLocation)
+import os
+import string
+import re
 import unittest
 from reportlab.lib.utils import open_and_read, open_and_readlines
+
+setOutDir(__name__)
+
 
 # Helper function and class.
 def unique(seq):
@@ -18,9 +23,10 @@ def unique(seq):
         return seq
 
     # Make a sorted copy of the input sequence.
-    cnvt = isinstance(seq,str)
+    cnvt = isinstance(seq, str)
     seq2 = seq[:]
-    if cnvt: seq2 = list(seq2)
+    if cnvt:
+        seq2 = list(seq2)
     seq2.sort()
 
     # Remove adjacent elements if they are identical.
@@ -39,6 +45,7 @@ def unique(seq):
         return seq[0:0].join(seq2)
     else:
         return seq2
+
 
 class SelfTestCase(unittest.TestCase):
     "Test unique() function."
@@ -70,15 +77,15 @@ class AsciiFileTestCase(unittest.TestCase):
         allPyFiles = GlobDirectoryWalker(RL_HOME, '*.py')
 
         for path in allPyFiles:
-            fileContent = open_and_read(path,'r')
-            nonAscii = [c for c in fileContent if ord(c)>127]
+            fileContent = open_and_read(path, 'r')
+            nonAscii = [c for c in fileContent if ord(c) > 127]
             nonAscii = unique(nonAscii)
 
             truncPath = path[path.find('reportlab'):]
             args = (truncPath, repr(list(map(ord, nonAscii))))
             msg = "File %s contains characters: %s." % args
-##            if nonAscii:
-##                print msg
+            # if nonAscii:
+            #     print msg
             assert not nonAscii, msg
 
 
@@ -92,7 +99,7 @@ class FilenameTestCase(unittest.TestCase):
         allPyFiles = GlobDirectoryWalker(RL_HOME, '*.py')
 
         for path in allPyFiles:
-            #hack - exclude barcode extensions from this test
+            # hack - exclude barcode extensions from this test
             if path.find('barcode'):
                 pass
             else:
@@ -101,8 +108,8 @@ class FilenameTestCase(unittest.TestCase):
                 msg = "Filename %s contains trailing digits." % truncPath
                 assert basename[-1] not in string.digits, msg
 
-    ##            if basename[-1] in string.digits:
-    ##                print truncPath
+                # if basename[-1] in string.digits:
+                #     print truncPath
 
 
 class FirstLineTestCase(SecureTestCase):
@@ -139,13 +146,15 @@ class FirstLineTestCase(SecureTestCase):
 
         file.close()
 
+
 def makeSuite():
     suite = makeSuiteForClasses(SelfTestCase, AsciiFileTestCase, FilenameTestCase)
     loader = unittest.TestLoader()
     suite.addTest(loader.loadTestsFromTestCase(FirstLineTestCase))
     return suite
 
-#noruntests
+
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

@@ -1,14 +1,17 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 # full screen test
 """Tests for PDF page modes support in reportlab.pdfgen.
 """
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+__version__ = '3.3.0'
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import os
 import unittest
 from reportlab.pdfgen.canvas import Canvas
+
+setOutDir(__name__)
+
 
 def fileDoesExist(path):
     "Check if a file does exist."
@@ -42,7 +45,6 @@ class PdfPageModeTestCase(unittest.TestCase):
 
         assert fileDoesExist(filename)
 
-
     def test0(self):
         "This should open in full screen mode."
         self._doTest('FullScreen.pdf', 'FullScreen', self.test0.__doc__)
@@ -55,11 +57,12 @@ class PdfPageModeTestCase(unittest.TestCase):
         "This should open in the user's default mode."
         self._doTest('UseNone.pdf', 'UseNone', self.test2.__doc__)
 
+
 def makeSuite():
     return makeSuiteForClasses(PdfPageModeTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

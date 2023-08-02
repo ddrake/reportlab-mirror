@@ -1,10 +1,17 @@
 """This executes tests defined outside the normal test suite.
 See docstring for class ExternalTestCase for more information.
 """
-from reportlab.lib.testutils import setOutDir,SecureTestCase, printLocation
-setOutDir(__name__)
-import os, string, fnmatch, re, sys, unittest
+from reportlab.lib.testutils import (setOutDir, SecureTestCase, printLocation)
+import os
+import string
+# import fnmatch
+# import re
+import sys
+import unittest
+
 EXTRA_FILE = 'extra.txt'
+setOutDir(__name__)
+
 
 class ExternalTestCase(SecureTestCase):
     """Test case starting cases external to the normal RL suite.
@@ -66,7 +73,7 @@ class ExternalTestCase(SecureTestCase):
                 os.chdir(folder)
                 sys.path.insert(0, folder)
 
-                module = __import__(modname) # seems to fail sometimes...
+                module = __import__(modname)  # seems to fail sometimes...
                 if 'makeSuite' in dir(module):
                     print("running", f)
                     testSuite = module.makeSuite()
@@ -83,7 +90,7 @@ def makeSuite():
     return suite
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         EXTRA_FILE = sys.argv[1]

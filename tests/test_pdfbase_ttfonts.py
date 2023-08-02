@@ -1,33 +1,35 @@
-
 """Test TrueType font subsetting & embedding code.
 
 This test uses a sample font (Vera.ttf) taken from Bitstream which is called Vera
 Serif Regular and is covered under the license in ../fonts/bitstream-vera-license.txt.
 """
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation, NearTestCase
-if __name__=='__main__':
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation, NearTestCase)
+if __name__ == '__main__':
     setOutDir(__name__)
 import unittest
 from io import BytesIO
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.pdfdoc import PDFDocument, PDFError
-from reportlab.pdfbase.ttfonts import TTFont, TTFontFace, TTFontFile, TTFOpenFile, \
-                                      TTFontParser, TTFontMaker, TTFError, \
-                                      makeToUnicodeCMap, \
-                                      FF_SYMBOLIC, FF_NONSYMBOLIC, \
-                                      calcChecksum, add32
+# from reportlab.pdfbase.pdfdoc import PDFError
+from reportlab.pdfbase.pdfdoc import PDFDocument
+from reportlab.pdfbase.ttfonts import (TTFont, TTFontFace, TTFontFile, TTFOpenFile,
+                                       TTFontParser, TTFontMaker, TTFError,
+                                       makeToUnicodeCMap, FF_SYMBOLIC, FF_NONSYMBOLIC,
+                                       calcChecksum, add32)
 from reportlab import rl_config
 from reportlab.lib.utils import int2Byte
+
 
 def utf8(code):
     "Convert a given UCS character index into UTF-8"
     return chr(code).encode('utf8')
 
-def _simple_subset_generation(fn,npages,alter=0,fonts=('Vera','VeraBI')):
+
+def _simple_subset_generation(fn, npages, alter=0, fonts=('Vera', 'VeraBI')):
     c = Canvas(outputfile(fn))
     c.setFont('Helvetica', 30)
-    c.drawString(100,700, 'Unicode TrueType Font Test %d pages' % npages)
+    c.drawString(100, 700, 'Unicode TrueType Font Test %d pages' % npages)
     # Draw a table of Unicode characters
     for p in range(npages):
         for fontName in fonts:
@@ -35,53 +37,57 @@ def _simple_subset_generation(fn,npages,alter=0,fonts=('Vera','VeraBI')):
             for i in range(32):
                 for j in range(32):
                     ch = utf8(i * 32 + j+p*alter)
-                    c.drawString(80 + j * 13 + int(j / 16.0) * 4, 600 - i * 13 - int(i / 8.0) * 8, ch)
+                    c.drawString(80 + j * 13 + int(j / 16.0) * 4,
+                                 600 - i * 13 - int(i / 8.0) * 8, ch)
         c.showPage()
     c.save()
 
-def show_all_glyphs(fn,fontName='Vera'):
+
+def show_all_glyphs(fn, fontName='Vera'):
     c = Canvas(outputfile(fn))
     c.setFont('Helvetica', 20)
-    c.drawString(72,c._pagesize[1]-30, 'Unicode TrueType Font Test %s' % fontName)
+    c.drawString(72, c._pagesize[1]-30, 'Unicode TrueType Font Test %s' % fontName)
     from reportlab.pdfbase.pdfmetrics import _fonts
     font = _fonts[fontName]
     doc = c._doc
     kfunc = font.face.charToGlyph.keys
     for s in sorted(list(kfunc())):
-        if s<0x10000:
-            font.splitString(chr(s),doc)
+        if s < 0x10000:
+            font.splitString(chr(s), doc)
     state = font.state[doc]
     cn = {}
-    #print('len(assignments)=%d'%  len(state.assignments))
+    # print('len(assignments)=%d'%  len(state.assignments))
     nzero = 0
     ifunc = state.assignments.items
     for code, n in sorted(list(ifunc())):
-        if code==0: nzero += 1
+        if code == 0:
+            nzero += 1
         cn[n] = chr(code)
-    if nzero>1: print('%s there were %d zero codes' % (fontName,nzero))
-
+    if nzero > 1:
+        print('%s there were %d zero codes' % (fontName, nzero))
 
     ymin = 10*12
     y = y0 = c._pagesize[1] - 72
-    for nss,subset in enumerate(state.subsets):
-        if y<ymin:
+    for nss, subset in enumerate(state.subsets):
+        if y < ymin:
             c.showPage()
             y = y0
         c.setFont('Helvetica', 10)
         x = 72
-        c.drawString(x,y,'Subset %d len=%d' % (nss,len(subset)))
-        #print('Subset %d len=%d' % (nss,len(subset)))
+        c.drawString(x, y, 'Subset %d len=%d' % (nss, len(subset)))
+        # print('Subset %d len=%d' % (nss,len(subset)))
         c.setFont(fontName, 10)
         for i, code in enumerate(subset):
-            if i%32 == 0:
+            if i % 32 == 0:
                 y -= 12
                 x = 72
-            c.drawString(x,y,chr(code))
+            c.drawString(x, y, chr(code))
             x += 13
         y -= 18
 
     c.showPage()
     c.save()
+
 
 class TTFontsTestCase(unittest.TestCase):
     "Make documents with TrueType fonts"
@@ -92,14 +98,16 @@ class TTFontsTestCase(unittest.TestCase):
         pdfmetrics.registerFont(TTFont("VeraBI", "VeraBI.ttf"))
         try:
             pdfmetrics.registerFont(TTFont("DejaVuSans", "DejaVuSans.ttf"))
-        except:
+        except Exception:
             pass
         else:
-            show_all_glyphs('test_pdfbase_ttfonts_dejavusans.pdf',fontName='DejaVuSans')
-        show_all_glyphs('test_pdfbase_ttfonts_vera.pdf',fontName='Vera')
-        _simple_subset_generation('test_pdfbase_ttfonts1.pdf',1)
-        _simple_subset_generation('test_pdfbase_ttfonts3.pdf',3)
-        _simple_subset_generation('test_pdfbase_ttfonts35.pdf',3,5)
+            show_all_glyphs('test_pdfbase_ttfonts_dejavusans.pdf',
+                            fontName='DejaVuSans')
+        show_all_glyphs('test_pdfbase_ttfonts_vera.pdf',
+                        fontName='Vera')
+        _simple_subset_generation('test_pdfbase_ttfonts1.pdf', 1)
+        _simple_subset_generation('test_pdfbase_ttfonts3.pdf', 3)
+        _simple_subset_generation('test_pdfbase_ttfonts35.pdf', 3, 5)
 
         # Do it twice with the same font object
         c = Canvas(outputfile('test_pdfbase_ttfontsadditional.pdf'))
@@ -122,6 +130,7 @@ class TTFontsTestCase(unittest.TestCase):
         c.drawString(100, 688, b'Hello World')
         c.save()
 
+
 class TTFontFileTestCase(NearTestCase):
     "Tests TTFontFile, TTFontParser and TTFontMaker classes"
 
@@ -130,7 +139,8 @@ class TTFontFileTestCase(NearTestCase):
         self.assertRaises(TTFError, TTFontFile, "nonexistent file")
         self.assertRaises(TTFError, TTFontFile, BytesIO(b""))
         self.assertRaises(TTFError, TTFontFile, BytesIO(b"invalid signature"))
-        self.assertRaises(TTFError, TTFontFile, BytesIO(b"OTTO - OpenType not supported yet"))
+        self.assertRaises(TTFError, TTFontFile,
+                          BytesIO(b"OTTO - OpenType not supported yet"))
         self.assertRaises(TTFError, TTFontFile, BytesIO(b"\0\1\0\0"))
 
     def testFontFileReads(self):
@@ -141,8 +151,9 @@ class TTFontFileTestCase(NearTestCase):
                 self._ttf_data = data
                 self._pos = 0
 
-        ttf = FakeTTFontFile(b"\x81\x02\x03\x04" b"\x85\x06" b"ABCD" b"\x7F\xFF" b"\x80\x00" b"\xFF\xFF")
-        self.assertEqual(ttf.read_ulong(), 0x81020304) # big-endian
+        ttf = FakeTTFontFile(
+            b"\x81\x02\x03\x04" b"\x85\x06" b"ABCD" b"\x7F\xFF" b"\x80\x00" b"\xFF\xFF")
+        self.assertEqual(ttf.read_ulong(), 0x81020304)  # big-endian
         self.assertEqual(ttf._pos, 4)
         self.assertEqual(ttf.read_ushort(), 0x8506)
         self.assertEqual(ttf._pos, 6)
@@ -158,17 +169,18 @@ class TTFontFileTestCase(NearTestCase):
         self.assertEqual(ttf.name, b"BitstreamVeraSans-Roman")
         self.assertEqual(ttf.flags, FF_SYMBOLIC)
         self.assertEqual(ttf.italicAngle, 0.0)
-        self.assertNear(ttf.ascent,759.765625)
-        self.assertNear(ttf.descent,-240.234375)
+        self.assertNear(ttf.ascent, 759.765625)
+        self.assertNear(ttf.descent, -240.234375)
         self.assertEqual(ttf.capHeight, 759.765625)
-        self.assertNear(ttf.bbox, [-183.10546875, -235.83984375, 1287.109375, 928.22265625])
+        self.assertNear(ttf.bbox, [-183.10546875, -235.83984375,
+                                   1287.109375, 928.22265625])
         self.assertEqual(ttf.stemV, 87)
         self.assertEqual(ttf.defaultWidth, 600.09765625)
 
     def testAdd32(self):
         "Test add32"
         self.assertEqual(add32(10, -6), 4)
-        self.assertEqual(add32(6, -10), -4&0xFFFFFFFF)
+        self.assertEqual(add32(6, -10), -4 & 0xFFFFFFFF)
         self.assertEqual(add32(0x80000000, -1), 0x7FFFFFFF)
         self.assertEqual(add32(0x7FFFFFFF, 1), 0x80000000)
 
@@ -190,10 +202,10 @@ class TTFontFileTestCase(NearTestCase):
     def testFontFileChecksum(self):
         "Tests TTFontFile and TTF parsing code"
         F = TTFOpenFile("Vera.ttf")[1].read()
-        TTFontFile(BytesIO(F), validate=1) # should not fail
-        F1 = F[:12345] + b"\xFF" + F[12346:] # change one byte
+        TTFontFile(BytesIO(F), validate=1)  # should not fail
+        F1 = F[:12345] + b"\xFF" + F[12346:]  # change one byte
         self.assertRaises(TTFError, TTFontFile, BytesIO(F1), validate=1)
-        F1 = F[:8] + b"\xFF" + F[9:] # change one byte
+        F1 = F[:8] + b"\xFF" + F[9:]  # change one byte
         self.assertRaises(TTFError, TTFontFile, BytesIO(F1), validate=1)
 
     def testSubsetting(self):
@@ -208,15 +220,18 @@ class TTFontFileTestCase(NearTestCase):
         subset.seek_table('loca')
         for n in range(4):
             pos = subset.read_ushort()    # this is actually offset / 2
-            self.assertFalse(pos % 2 != 0, "glyph %d at +%d should be long aligned" % (n, pos * 2))
+            self.assertFalse(
+                pos % 2 != 0,
+                "glyph %d at +%d should be long aligned" % (n, pos * 2))
 
         self.assertEqual(subset.name, b"BitstreamVeraSans-Roman")
         self.assertEqual(subset.flags, FF_SYMBOLIC)
         self.assertEqual(subset.italicAngle, 0.0)
-        self.assertNear(subset.ascent,759.765625)
-        self.assertNear(subset.descent,-240.234375)
+        self.assertNear(subset.ascent, 759.765625)
+        self.assertNear(subset.descent, -240.234375)
         self.assertEqual(subset.capHeight, 759.765625)
-        self.assertNear(subset.bbox, [-183.10546875, -235.83984375, 1287.109375, 928.22265625])
+        self.assertNear(subset.bbox,
+                        [-183.10546875, -235.83984375, 1287.109375, 928.22265625])
         self.assertEqual(subset.stemV, 87)
 
     def testFontMaker(self):
@@ -238,13 +253,14 @@ class TTFontFaceTestCase(unittest.TestCase):
         "Tests TTFontFace.addSubsetObjects"
         face = TTFontFace("Vera.ttf")
         doc = PDFDocument()
-        fontDescriptor = face.addSubsetObjects(doc, "TestFont", [ 0x78, 0x2017 ])
+        fontDescriptor = face.addSubsetObjects(doc, "TestFont", [0x78, 0x2017])
         fontDescriptor = doc.idToObject[fontDescriptor.name].dict
         self.assertEqual(fontDescriptor['Type'], '/FontDescriptor')
         self.assertEqual(fontDescriptor['Ascent'], face.ascent)
         self.assertEqual(fontDescriptor['CapHeight'], face.capHeight)
         self.assertEqual(fontDescriptor['Descent'], face.descent)
-        self.assertEqual(fontDescriptor['Flags'], (face.flags & ~FF_NONSYMBOLIC) | FF_SYMBOLIC)
+        self.assertEqual(fontDescriptor['Flags'],
+                         (face.flags & ~FF_NONSYMBOLIC) | FF_SYMBOLIC)
         self.assertEqual(fontDescriptor['FontName'], "/TestFont")
         self.assertEqual(fontDescriptor['FontBBox'].sequence, face.bbox)
         self.assertEqual(fontDescriptor['ItalicAngle'], face.italicAngle)
@@ -263,7 +279,7 @@ class TTFontTestCase(NearTestCase):
         self.assertTrue(font.stringWidth("test", 10) > 0)
         width = font.stringWidth(utf8(0x2260) * 2, 1000)
         expected = font.face.getCharWidth(0x2260) * 2
-        self.assertNear(width,expected)
+        self.assertNear(width, expected)
 
     def testTTFontFromBytesIO(self):
         "Test loading TTFont from in-memory file"
@@ -271,7 +287,8 @@ class TTFontTestCase(NearTestCase):
         # Glyphless variation of vedaal's invisible font retrieved from
         # http://www.angelfire.com/pr/pgpf/if.html, which says:
         # 'Invisible font' is unrestricted freeware. Enjoy, Improve, Distribute freely
-        import zlib, base64
+        import zlib
+        import base64
         font = """
         eJzdlk1sG0UUx/+zs3btNEmrUKpCPxikSqRS4jpfFURUagmkEQQoiRXgAl07Y3vL2mvt2ml8APXG
         hQPiUEGEVDhWVHyIC1REPSAhBOWA+BCgSoULUqsKcWhVBKjhzfPU+VCi3Flrdn7vzZv33ryZ3TUE
@@ -296,12 +313,13 @@ class TTFontTestCase(NearTestCase):
         """.encode('latin1')
         uncompressed = zlib.decompress(base64.decodebytes(font))
         ttf = BytesIO(uncompressed)
-        setattr(ttf ,"name", "(invisible.ttf)")
+        setattr(ttf, "name", "(invisible.ttf)")
         font = TTFont('invisible', ttf)
         for coord in font.face.bbox:
             self.assertEqual(coord, 0)
         pdfmetrics.registerFont(font)
-        _simple_subset_generation('test_pdfbase_ttffonts_invisible.pdf',2,fonts=('invisible',))
+        _simple_subset_generation('test_pdfbase_ttffonts_invisible.pdf', 2,
+                                  fonts=('invisible',))
 
     def testSplitString(self):
         "Tests TTFont.splitString"
@@ -317,8 +335,10 @@ class TTFontTestCase(NearTestCase):
         self.assertEqual(font.splitString(text, doc), chunks)
 
         text = b"".join(utf8(i) for i in range(510, -1, -1))
-        revver = lambda b: map(int2Byte,reversed(b))
-        chunks = [(i[0],b"".join(revver(i[1]))) for i in reversed(chunks)]
+
+        def revver(b):
+            return map(int2Byte, reversed(b))
+        chunks = [(i[0], b"".join(revver(i[1]))) for i in reversed(chunks)]
         self.assertEqual(font.splitString(text, doc), chunks)
 
     def testSplitStringSpaces(self):
@@ -329,7 +349,7 @@ class TTFontTestCase(NearTestCase):
         doc = PDFDocument()
         font = TTFont("Vera", "Vera.ttf")
         text = b"".join(utf8(i) for i in range(512, -1, -1))
-        chunks = font.splitString(text, doc)
+        font.splitString(text, doc)
         state = font.state[doc]
         self.assertEqual(state.assignments[32], 32)
         self.assertEqual(state.subsets[0][32], 32)
@@ -379,10 +399,13 @@ class TTFontTestCase(NearTestCase):
             font = TTFont("Vera", "Vera.ttf")
             self.assertEqual(font.splitString('hello ', doc1), [(0, b'hello ')])
             self.assertEqual(font.splitString('hello ', doc2), [(0, b'hello ')])
-            self.assertEqual(font.splitString(u'\u0410\u0411'.encode('UTF-8'), doc1), [(0, b'\x80\x81')])
-            self.assertEqual(font.splitString(u'\u0412'.encode('UTF-8'), doc2), [(0, b'\x80')])
+            self.assertEqual(font.splitString(u'\u0410\u0411'.encode('UTF-8'),
+                                              doc1), [(0, b'\x80\x81')])
+            self.assertEqual(font.splitString(u'\u0412'.encode('UTF-8'), doc2),
+                             [(0, b'\x80')])
             font.addObjects(doc1)
-            self.assertEqual(font.splitString(u'\u0413'.encode('UTF-8'), doc2), [(0, b'\x81')])
+            self.assertEqual(font.splitString(u'\u0413'.encode('UTF-8'), doc2),
+                             [(0, b'\x81')])
             font.addObjects(doc2)
         finally:
             rl_config.ttfAsciiReadable = ttfAsciiReadable
@@ -414,8 +437,9 @@ class TTFontTestCase(NearTestCase):
 
     def testMakeToUnicodeCMap(self):
         "Test makeToUnicodeCMap"
-        self.assertEqual(makeToUnicodeCMap("TestFont", [ 0x1234, 0x4321, 0x4242 ]),
-"""/CIDInit /ProcSet findresource begin
+        self.assertEqual(makeToUnicodeCMap(
+            "TestFont", [0x1234, 0x4321, 0x4242]),
+            """/CIDInit /ProcSet findresource begin
 12 dict begin
 begincmap
 /CIDSystemInfo
@@ -448,7 +472,7 @@ def makeSuite():
     return suite
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

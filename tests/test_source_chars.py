@@ -1,16 +1,19 @@
 #!/usr/bin/env python
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """This tests for things in source files.  Initially, absence of tabs :-)
 """
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, SecureTestCase, GlobDirectoryWalker, printLocation
-setOutDir(__name__)
-from reportlab.lib.testutils import RL_HOME,testsFolder
-__version__='3.3.0'
-import os, sys, glob, re
-import reportlab
+__version__ = '3.3.0'
+
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     SecureTestCase, GlobDirectoryWalker, printLocation)
+from reportlab.lib.testutils import RL_HOME
+import os
+import sys
 import unittest
 from reportlab.lib.utils import open_and_read
+
+setOutDir(__name__)
 
 
 class SourceTester(SecureTestCase):
@@ -18,10 +21,11 @@ class SourceTester(SecureTestCase):
         SecureTestCase.setUp(self)
         try:
             fn = __file__
-        except:
+        except Exception:
             fn = sys.argv[0]
 
-        self.output = open(outputfile(os.path.splitext(os.path.basename(fn))[0]+'.txt'),'w')
+        self.output = open(outputfile(
+            os.path.splitext(os.path.basename(fn))[0]+'.txt'), 'w')
 
     def tearDown(self):
         self.output.close()
@@ -31,8 +35,10 @@ class SourceTester(SecureTestCase):
         chunks = txt.split('\t')
         tabCount = len(chunks) - 1
         if tabCount:
-            #raise Exception, "File %s contains %d tab characters!" % (filename, tabCount)
-            self.output.write("file %s contains %d tab characters!\n" % (filename, tabCount))
+            # raise Exception, "File %s contains %d tab characters!" % (
+            #      filename, tabCount)
+            self.output.write("file %s contains %d tab characters!\n" %
+                              (filename, tabCount))
 
     def checkFileForTrailingSpaces(self, filename):
         txt = open_and_read(filename, 'r')
@@ -41,19 +47,23 @@ class SourceTester(SecureTestCase):
         badChars = 0
         for line in txt.split('\n'):
             stripped = line.rstrip()
-            spaces = len(line) - len(stripped)  # OK, so they might be trailing tabs, who cares?
+            # OK, so they might be trailing tabs, who cares?
+            spaces = len(line) - len(stripped)
             if spaces:
                 badLines = badLines + 1
                 badChars = badChars + spaces
 
         if badChars != 0:
-            self.output.write("file %s contains %d trailing spaces, or %0.2f%% wastage\n" % (filename, badChars, 100.0*badChars/initSize))
+            self.output.write(("file %s contains %d trailing spaces, " +
+                               "or %0.2f%% wastage\n") %
+                              (filename, badChars, 100.0*badChars/initSize))
 
     def testFiles(self):
         w = GlobDirectoryWalker(RL_HOME, '*.py')
         for filename in w:
             self.checkFileForTabs(filename)
             self.checkFileForTrailingSpaces(filename)
+
 
 def zapTrailingWhitespace(dirname):
     """Eliminates trailing spaces IN PLACE.  Use with extreme care
@@ -73,7 +83,8 @@ def zapTrailingWhitespace(dirname):
         for line in txt.split('\n'):
             stripped = line.rstrip()
             cleaned.append(stripped)
-            spaces = len(line) - len(stripped)  # OK, so they might be trailing tabs, who cares?
+            # OK, so they might be trailing tabs, who cares?
+            spaces = len(line) - len(stripped)
             if spaces:
                 badChars = badChars + spaces
 
@@ -82,11 +93,12 @@ def zapTrailingWhitespace(dirname):
             print("file %s contained %d trailing spaces, FIXED" % (filename, badChars))
     print('done')
 
+
 def makeSuite():
     return makeSuiteForClasses(SourceTester)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == 'zap' and os.path.isdir(sys.argv[2]):
         zapTrailingWhitespace(sys.argv[2])

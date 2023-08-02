@@ -1,12 +1,15 @@
 #!/bin/env python
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-__version__='3.3.0'
-__doc__="""Test reportlab.lib.util module"""
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+__version__ = '3.3.0'
+__doc__ = """Test reportlab.lib.util module"""
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses,
+                                     printLocation)
 import unittest
 from reportlab.lib.utils import FmtSelfDict, encode_label, decode_label
+
+setOutDir(__name__)
+
 
 class FmtTestCase(unittest.TestCase):
 
@@ -22,18 +25,21 @@ class FmtTestCase(unittest.TestCase):
         self.assertRaises(ValueError, obj._fmt, 'blah %')
         self.assertEqual(
             'moon AA june_BB spoon %(a)sCC ni',
-            obj._fmt('moon %(a)s june%(_b)s spoon %%(a)s%(c)s %(d)s', c='CC', C='boon', d='ni'))
-        self.assertRaises(AttributeError, obj._fmt, '%(c)s')  # XXX bit weird, can this be changed?
+            obj._fmt('moon %(a)s june%(_b)s spoon %%(a)s%(c)s %(d)s',
+                     c='CC', C='boon', d='ni'))
+        # XXX bit weird, can this be changed?
+        self.assertRaises(AttributeError, obj._fmt, '%(c)s')
 
     def testLabelCoding(self):
-        a = (1,2,[3,4],"a"), [1,2,"4",b'4']
+        a = (1, 2, [3, 4], "a"), [1, 2, "4", b'4']
         assert a == decode_label(encode_label(a))
+
 
 def makeSuite():
     return makeSuiteForClasses(FmtTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

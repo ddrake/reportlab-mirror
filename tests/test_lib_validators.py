@@ -1,10 +1,12 @@
 """Tests (incomplete) for the reportlab.lib.validators module.
 """
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, printLocation
-setOutDir(__name__)
+from reportlab.lib.testutils import setOutDir, makeSuiteForClasses, printLocation
 import unittest
 from reportlab.lib import colors
 from reportlab.lib import validators
+
+setOutDir(__name__)
+
 
 class ValidatorTestCase(unittest.TestCase):
     "Test validating functions."
@@ -14,14 +16,13 @@ class ValidatorTestCase(unittest.TestCase):
 
         msg = "Validation failed for 'boolean' %s!"
 
-        booleans = [0, 1, 'yes','no','true','false']
-        badbooleans = ['a',3,-1,()]
+        booleans = [0, 1, 'yes', 'no', 'true', 'false']
+        badbooleans = ['a', 3, -1, ()]
         isBoolean = validators.isBoolean
         for b in booleans:
             assert isBoolean(b) == 1, msg % str(b)
         for b in badbooleans:
             assert isBoolean(b) == 0, msg % str(b)
-
 
     def test1(self):
         "Test isNumber validator."
@@ -29,7 +30,7 @@ class ValidatorTestCase(unittest.TestCase):
         msg = 'Validation failed for number %s!'
 
         numbers = [0, 1, 2, -1, -2, 0.0, 0.1, -0.1]
-        badNumbers = ['aaa',(1,1),(1+1j),colors]
+        badNumbers = ['aaa', (1, 1), (1+1j), colors]
         isNumber = validators.isNumber
         isListOfNumbers = validators.isListOfNumbers
         for n in numbers:
@@ -43,17 +44,15 @@ class ValidatorTestCase(unittest.TestCase):
         assert isListOfNumbers(badNumbers) == 0, msg % str(badNumbers)
         assert isListOfNumbers(numbers+[colors]) == 0, msg % str(numbers+[colors])
 
-
     def test2(self):
         "Test isNumberOrNone validator."
 
         msg = 'Validation failed for number %s!'
 
-        numbers = [None, 0, 1, 2, -1, -2, 0.0, 0.1, -0.1] #, 2L, -2L]
+        numbers = [None, 0, 1, 2, -1, -2, 0.0, 0.1, -0.1]  # , 2L, -2L]
         isNumberOrNone = validators.isNumberOrNone
         for n in numbers:
             assert isNumberOrNone(n) == 1, msg % str(n)
-
 
     def test4(self):
         "Test isString validator."
@@ -61,7 +60,7 @@ class ValidatorTestCase(unittest.TestCase):
         msg = 'Validation failed for string %s!'
 
         strings = ['', '\n', '  ', 'foo', '""']
-        badStrings = [1,2.0,None,('a','b')]
+        badStrings = [1, 2.0, None, ('a', 'b')]
         isString = validators.isString
         isListOfStrings = validators.isListOfStrings
         for s in strings:
@@ -74,7 +73,6 @@ class ValidatorTestCase(unittest.TestCase):
         assert isListOfStrings(strings) == 1, msg % str(strings)
         assert isListOfStrings(badStrings) == 0, msg % str(badStrings)
         assert isListOfStrings(strings+[1]) == 0, msg % str(strings+[1])
-
 
     def test5(self):
         "Test isTextAnchor validator."
@@ -99,7 +97,6 @@ class ValidatorTestCase(unittest.TestCase):
         class SequenceOf:
         """
 
-
     def test6(self):
         "Test OneOf validator."
 
@@ -119,30 +116,30 @@ class ValidatorTestCase(unittest.TestCase):
             assert OneOf(c) == 0, msg % c
 
         try:
-            validators.OneOf(choices,'bongo')
+            validators.OneOf(choices, 'bongo')
             raise AssertionError("OneOf failed to detect bad arguments")
         except ValueError:
             pass
 
         import re
         V = [
-            validators.OneOf('scalar','vector','matrix'),
-            validators.OneOf('scalar',re.compile(r'^vector(?:|\W.*)$'),'matrix'),
+            validators.OneOf('scalar', 'vector', 'matrix'),
+            validators.OneOf('scalar', re.compile(r'^vector(?:|\W.*)$'), 'matrix'),
             ]
-        for t,x in (
-                ('scalar',(True,True)),
-                ('vector',(True,True)),
-                ('vector[0]',(False,True)),
-                ('vector1',(False,False)),
-                ('matrix',(True,True)),
-                ('matrix1',(False,False)),
-                ('matrix[0]',(False,False)),
+        for t, x in (
+                ('scalar', (True, True)),
+                ('vector', (True, True)),
+                ('vector[0]', (False, True)),
+                ('vector1', (False, False)),
+                ('matrix', (True, True)),
+                ('matrix1', (False, False)),
+                ('matrix[0]', (False, False)),
                 ):
-            r = (V[0].test(t),V[1].test(t))
-            self.assertEqual(x,r,
-                "\n!!!!! regex OneOf validation failed for %r\n%sexpected=%r != result=%r"
-                    % (t,6*' ',x,r))
-
+            r = (V[0].test(t), V[1].test(t))
+            self.assertEqual(
+                x, r,
+                "\n!!!!! regex OneOf validation failed for " +
+                "%r\n%sexpected=%r != result=%r" % (t, 6*' ', x, r))
 
     def test7(self):
         "Test isInt validator"
@@ -150,26 +147,27 @@ class ValidatorTestCase(unittest.TestCase):
         msg = 'Validation failed for isInt %s!'
 
         isInt = validators.isInt
-        for c in (1,2,-3,0,'-4','4'):
+        for c in (1, 2, -3, 0, '-4', '4'):
             assert isInt(c), msg % str(c)
 
-        for c in (1.2,0.0,-3.0,'-4.0','4.4','AAAA'):
+        for c in (1.2, 0.0, -3.0, '-4.0', '4.4', 'AAAA'):
             assert not isInt(c), msg % str(c)
-
 
     def test8(self):
         "test Sequence of validator"
 
         msg = 'Validation failed for SequenceOf %s!'
 
-        v=validators.SequenceOf(validators.OneOf(('eps','pdf','png','gif','jpg','tif')),lo=1,hi=3,emptyOK=0)
-        for c in (['png'],('eps',),('eps','pdf')):
+        v = validators.SequenceOf(
+            validators.OneOf(('eps', 'pdf', 'png', 'gif', 'jpg', 'tif')),
+            lo=1, hi=3, emptyOK=0)
+        for c in (['png'], ('eps', ), ('eps', 'pdf')):
             assert v(c), msg % str(c)
         v._lo = 2
-        for c in ([],(),('eps'),('eps','pdf','a'),['eps','pdf','png','gif']):
+        for c in ([], (), ('eps'), ('eps', 'pdf', 'a'), ['eps', 'pdf', 'png', 'gif']):
             assert not v(c), msg % str(c)
-        v._emptyOK=1
-        for c in ([],(),('eps','pdf')):
+        v._emptyOK = 1
+        for c in ([], (), ('eps', 'pdf')):
             assert v(c), msg % str(c)
 
 
@@ -177,7 +175,7 @@ def makeSuite():
     return makeSuiteForClasses(ValidatorTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

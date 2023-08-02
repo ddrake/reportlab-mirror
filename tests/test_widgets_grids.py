@@ -1,12 +1,13 @@
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import unittest
 from reportlab.lib import colors
-from reportlab.graphics.shapes import Drawing, Group, Line, Rect
-from reportlab.graphics.widgetbase import Widget
-from reportlab.graphics.widgets.grids import *
+from reportlab.graphics.shapes import Drawing
+from reportlab.graphics.widgets.grids import (colorRange, Grid, ShadedRect, DoubleGrid)
 from reportlab.graphics import renderPDF
 from reportlab.graphics import renderSVG
+
+setOutDir(__name__)
 
 
 class GridTestCase(unittest.TestCase):
@@ -29,7 +30,6 @@ class GridTestCase(unittest.TestCase):
         for c in colorRange(c0, c1, 4):
             print(c)
         print()
-
 
     def makeDrawing0(self):
         "Generate a RLG drawing with some uncommented grid samples."
@@ -179,7 +179,6 @@ class GridTestCase(unittest.TestCase):
 
         return D
 
-
     def makeDrawing1(self):
         "Generate a RLG drawing with some uncommented grid samples."
 
@@ -263,7 +262,6 @@ class GridTestCase(unittest.TestCase):
 
         return D
 
-
     def makeDrawing2(self):
         "Generate a RLG drawing with some uncommented grid samples."
 
@@ -340,8 +338,8 @@ class GridTestCase(unittest.TestCase):
                     sr.y = y
                     sr.width = s
                     sr.height = s
-    ##                  sr.fillColorStart = colors.Color(0, 0, 0)
-    ##                  sr.fillColorEnd = colors.Color(1, 1, 1)
+                    # sr.fillColorStart = colors.Color(0, 0, 0)
+                    # sr.fillColorEnd = colors.Color(1, 1, 1)
                     sr.fillColorStart = colors.CMYKColor(0, 0, 0, 0)
                     sr.fillColorEnd = colors.CMYKColor(1, 1, 1, 1)
                     if col == 0:
@@ -360,8 +358,8 @@ class GridTestCase(unittest.TestCase):
                     sr.y = y
                     sr.width = s
                     sr.height = s
-    ##                  sr.fillColorStart = colors.red
-    ##                  sr.fillColorEnd = colors.blue
+                    # sr.fillColorStart = colors.red
+                    # sr.fillColorEnd = colors.blue
                     sr.fillColorStart = colors.CMYKColor(1, 0, 0, 0)
                     sr.fillColorEnd = colors.CMYKColor(0, 0, 1, 0)
                     sr.orientation = 'horizontal'
@@ -381,10 +379,14 @@ class GridTestCase(unittest.TestCase):
                     sr.y = y
                     sr.width = s
                     sr.height = s
-    ##                  sr.fillColorStart = colors.white
-    ##                  sr.fillColorEnd = colors.green
-                    sr.fillColorStart = colors.PCMYKColor(11.0,11.0,72.0,0.0,    spotName='PANTONE 458 CV',density=1.00)
-                    sr.fillColorEnd = colors.PCMYKColor(100.0,65.0,0.0,30.0,    spotName='PANTONE 288 CV',density=1.00)
+                    # sr.fillColorStart = colors.white
+                    # sr.fillColorEnd = colors.green
+                    sr.fillColorStart = colors.PCMYKColor(11.0, 11.0, 72.0, 0.0,
+                                                          spotName='PANTONE 458 CV',
+                                                          density=1.00)
+                    sr.fillColorEnd = colors.PCMYKColor(100.0, 65.0, 0.0, 30.0,
+                                                        spotName='PANTONE 288 CV',
+                                                        density=1.00)
                     sr.orientation = 'horizontal'
                     if col == 0:
                         sr.numShades = 10
@@ -418,7 +420,6 @@ class GridTestCase(unittest.TestCase):
 
         return D
 
-
     def test0(self):
         "Generate PDF and SVG documents of first sample drawing."
 
@@ -426,14 +427,12 @@ class GridTestCase(unittest.TestCase):
         renderPDF.drawToFile(d, outputfile('test_widgets_grids0.pdf'))
         renderSVG.drawToFile(d, outputfile('test_widgets_grids0.svg'))
 
-
     def test1(self):
         "Generate PDF and SVG documents of second sample drawing."
 
         d = self.makeDrawing1()
         renderPDF.drawToFile(d, outputfile('test_widgets_grids1.pdf'))
         renderSVG.drawToFile(d, outputfile('test_widgets_grids1.svg'))
-
 
     def test2(self):
         "Generate PDF and SVG documents of third sample drawing."
@@ -447,7 +446,7 @@ def makeSuite():
     return makeSuiteForClasses(GridTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

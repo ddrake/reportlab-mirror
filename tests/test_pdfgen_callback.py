@@ -1,15 +1,17 @@
 #!/bin/env python
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-__doc__='checks callbacks work'
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+'''checks callbacks work'''
+__version__ = '3.3.0'
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import unittest
-from reportlab.pdfgen.canvas import Canvas
+# from reportlab.pdfgen.canvas import Canvas
 from tests.test_pdfgen_general import makeDocument
 
+setOutDir(__name__)
 _PAGE_COUNT = 0
+
 
 class CallBackTestCase(unittest.TestCase):
     "checks it gets called"
@@ -22,7 +24,7 @@ class CallBackTestCase(unittest.TestCase):
 
         self.pageCount = 0
         makeDocument(outputfile('test_pdfgen_callback.pdf'), pageCallBack=self.callMe)
-        #no point saving it!
+        # no point saving it!
         assert self.pageCount >= 7, 'page count not called!'
 
 
@@ -30,7 +32,7 @@ def makeSuite():
     return makeSuiteForClasses(CallBackTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

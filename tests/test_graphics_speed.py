@@ -1,22 +1,26 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """
 This does a test drawing with lots of things in it, running
 with and without attribute checking.
 """
 __version__ = '''$Id$'''
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
-import os, sys, time
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
+# import os
+# import sys
+import time
 import reportlab.rl_config
 import unittest
 from reportlab.lib import colors
-from reportlab.lib.units import cm
+# from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.platypus import Flowable
-from reportlab.graphics.shapes import *
+# from reportlab.pdfbase.pdfmetrics import stringWidth
+# from reportlab.platypus import Flowable
+from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.piecharts import Pie
+
+setOutDir(__name__)
 
 
 class GraphicsSpeedTestCase(unittest.TestCase):
@@ -40,12 +44,12 @@ class GraphicsSpeedTestCase(unittest.TestCase):
             pc = Pie()
             pc.x = 150
             pc.y = 50
-            pc.data = [10,20,30,40,50,60]
-            pc.labels = ['a','b','c','d','e','f']
-            pc.slices.strokeWidth=0.5
+            pc.data = [10, 20, 30, 40, 50, 60]
+            pc.labels = ['a', 'b', 'c', 'd', 'e', 'f']
+            pc.slices.strokeWidth = 0.5
             pc.slices[3].popout = 20
             pc.slices[3].strokeWidth = 2
-            pc.slices[3].strokeDashArray = [2,2]
+            pc.slices[3].strokeDashArray = [2, 2]
             pc.slices[3].labelRadius = 1.75
             pc.slices[3].fontColor = colors.red
             d.add(pc)
@@ -54,7 +58,8 @@ class GraphicsSpeedTestCase(unittest.TestCase):
         t1 = time.time()
 
         result = 'drew %d pie charts in %0.4f' % (num, t1 - t0)
-        open(outputfile('test_graphics_speed_test%s.log' % (isFast+1)), 'w').write(result)
+        open(outputfile('test_graphics_speed_test%s.log' %
+                        (isFast+1)), 'w').write(result)
 
     def test1(self, isFast=1):
         "Same as test1(), but with shape checking turned on."
@@ -72,11 +77,12 @@ class GraphicsSpeedTestCase(unittest.TestCase):
             # but fails, when imported from runAll.py...
             profile.run("t = GraphicsSpeedTestCase('test2')", fileName)
 
+
 def makeSuite():
     return makeSuiteForClasses(GraphicsSpeedTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

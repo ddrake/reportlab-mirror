@@ -1,26 +1,29 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """
 Tests for the text Label class.
 """
-from reportlab.lib.testutils import setOutDir,setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 
-import os, sys, copy
-from os.path import join, basename, splitext
+# import os
+# import sys
+import copy
 import unittest
 from reportlab.lib import colors
 from reportlab.lib.units import cm
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+# from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.graphics.shapes import *
+from reportlab.graphics.shapes import Drawing, Line
 from reportlab.graphics.charts.textlabels import Label
 from reportlab.platypus.flowables import Spacer, PageBreak
 from reportlab.platypus.paragraph import Paragraph
-from reportlab.platypus.xpreformatted import XPreformatted
+# from reportlab.platypus.xpreformatted import XPreformatted
 from reportlab.platypus.frames import Frame
 from reportlab.platypus.doctemplate import PageTemplate, BaseDocTemplate
+
+setOutDir(__name__)
 
 
 def myMainPageFrame(canvas, doc):
@@ -28,7 +31,7 @@ def myMainPageFrame(canvas, doc):
 
     canvas.saveState()
 
-    #canvas.rect(2.5*cm, 2.5*cm, 15*cm, 25*cm)
+    # canvas.rect(2.5*cm, 2.5*cm, 15*cm, 25*cm)
     canvas.setFont('Times-Roman', 12)
     pageNumber = canvas.getPageNumber()
     canvas.drawString(10*cm, cm, str(pageNumber))
@@ -64,7 +67,6 @@ class LabelTestCase(unittest.TestCase):
 
         c.save()
 
-
     def _makeProtoLabel(self):
         "Return a label prototype for further modification."
 
@@ -78,10 +80,9 @@ class LabelTestCase(unittest.TestCase):
 
         return protoLabel
 
-
     def _makeDrawings(self, protoLabel, text=None):
         # Set drawing dimensions.
-        w, h = drawWidth, drawHeight = 400, 100
+        w, h = 400, 100
 
         drawings = []
 
@@ -91,14 +92,14 @@ class LabelTestCase(unittest.TestCase):
             # Create drawing.
             d = Drawing(w, h)
             d.add(Line(0, h*0.5, w, h*0.5, strokeColor=colors.gray, strokeWidth=0.5))
-            d.add(Line(w*0.5 ,0, w*0.5, h, strokeColor=colors.gray, strokeWidth=0.5))
+            d.add(Line(w*0.5, 0, w*0.5, h, strokeColor=colors.gray, strokeWidth=0.5))
 
             labels = []
             for boxAnchor in boxAnchors:
                 # Modify label, put it on a drawing.
                 label = copy.deepcopy(protoLabel)
                 label.boxAnchor = boxAnchor
-                args = {'ba':boxAnchor, 'text':text or 'Hello World!'}
+                args = {'ba': boxAnchor, 'text': text or 'Hello World!'}
                 label.setText('(%(ba)s) %(text)s (%(ba)s)' % args)
                 labels.append(label)
 
@@ -108,7 +109,6 @@ class LabelTestCase(unittest.TestCase):
             drawings.append(d)
 
         return drawings
-
 
     def test1(self):
         "Test all different box anchors."
@@ -134,7 +134,7 @@ canonical points of a box: sw, se, nw, ne, w, e, n, s or c (standing for
         story.append(Paragraph('Helvetica 10pt', h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.textAnchor = 'start'
@@ -151,7 +151,7 @@ canonical points of a box: sw, se, nw, ne, w, e, n, s or c (standing for
         story.append(Paragraph('Helvetica 18pt', h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.textAnchor = 'start'
@@ -170,12 +170,12 @@ canonical points of a box: sw, se, nw, ne, w, e, n, s or c (standing for
             from reportlab.pdfbase.ttfonts import TTFont
             fontName = 'Vera'
             registerFont(TTFont(fontName, "Vera.ttf"))
-        except:
+        except Exception:
             fontName = 'Helvetica'
         story.append(Paragraph('%s 18pt, multi-line' % fontName, h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.textAnchor = 'start'
@@ -198,7 +198,7 @@ textAnchor attribute.""", bt))
         story.append(Paragraph("Helvetica 10pt, textAnchor='start'", h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.width = 4*cm
@@ -217,7 +217,7 @@ textAnchor attribute.""", bt))
         story.append(Paragraph("Helvetica 10pt, textAnchor='middle'", h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.width = 4*cm
@@ -236,7 +236,7 @@ textAnchor attribute.""", bt))
         story.append(Paragraph("Helvetica 10pt, textAnchor='end'", h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.width = 4*cm
@@ -255,7 +255,7 @@ textAnchor attribute.""", bt))
         story.append(Paragraph("Helvetica 10pt, multi-line, textAnchor='start'", h3))
         story.append(Spacer(0, 0.5*cm))
 
-        w, h = drawWidth, drawHeight = 400, 100
+        drawWidth, drawHeight = 400, 100
         protoLabel = self._makeProtoLabel()
         protoLabel.setOrigin(drawWidth*0.5, drawHeight*0.5)
         protoLabel.width = 4*cm
@@ -279,7 +279,7 @@ def makeSuite():
     return makeSuiteForClasses(LabelTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

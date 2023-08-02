@@ -1,22 +1,22 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """Test long documents with indexes, tables and cross-references
 """
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
-import sys, os, time, random
+__version__ = '3.3.0'
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
+import random
 from reportlab.rl_config import invariant as rl_invariant
-from operator import truth
 import unittest
 from reportlab.lib import colors
 from reportlab.lib.units import cm
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import Paragraph, Flowable, Frame, PageTemplate, BaseDocTemplate
-from reportlab.platypus.frames import Frame
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Paragraph, Frame, PageTemplate, BaseDocTemplate
 from reportlab.lib.randomtext import randomText, PYTHON
 from reportlab.platypus.tableofcontents import TableOfContents, SimpleIndex
+
+setOutDir(__name__)
+
 
 def myMainPageFrame(canvas, doc):
     "The page frame used for all PDF documents."
@@ -59,18 +59,18 @@ class MyDocTemplate(BaseDocTemplate):
             # would be driven by markup.
             try:
                 text = flowable.getPlainText()
-            except:
+            except Exception:
                 return
-            for phrase in ['uniform','depraved','finger', 'Fraudulin']:
+            for phrase in ['uniform', 'depraved', 'finger', 'Fraudulin']:
                 if text.find(phrase) > -1:
                     self.notify('IndexEntry', (phrase, self.page))
-                    #print 'IndexEntry:',phrase, self.page
+                    # print 'IndexEntry:',phrase, self.page
 
 
 def _test0(self):
     "This makes one long multi-page paragraph."
-    from reportlab.platypus.flowables import DocAssign, DocExec, DocPara, DocIf, DocWhile
-    if rl_invariant: random.seed(1629812163)
+    if rl_invariant:
+        random.seed(1629812163)
 
     # Build story.
     story = []
@@ -100,17 +100,24 @@ def _test0(self):
 
     chapterNum = 1
     for i in range(10):
-        story.append(Paragraph('Chapter %d: Chapters always starts a new page' % chapterNum, h1))
+        story.append(Paragraph('Chapter %d: Chapters always starts a new page' %
+                               chapterNum, h1))
         chapterNum = chapterNum + 1
         for j in range(3):
-            story.append(Paragraph('Heading1 paragraphs should always'
-                            'have a page break before.  Heading 2 on the other hand'
-                            'should always have a FRAME break before (%d)' % len(story), bt))
-            story.append(Paragraph('Heading 2 should always be kept with the next thing (%d)' % len(story), h2))
+            story.append(Paragraph(
+                'Heading1 paragraphs should always'
+                'have a page break before.  Heading 2 on the other hand'
+                'should always have a FRAME break before (%d)' % len(story), bt))
+            story.append(Paragraph(
+                'Heading 2 should always be kept with the next thing (%d)' %
+                len(story), h2))
             for j in range(3):
-                story.append(Paragraph(randomText(theme=PYTHON, sentences=2)+' (%d)' % len(story), bt))
-                story.append(Paragraph('I should never be at the bottom of a frame (%d)' % len(story), h2))
-                story.append(Paragraph(randomText(theme=PYTHON, sentences=1)+' (%d)' % len(story), bt))
+                story.append(Paragraph(
+                    randomText(theme=PYTHON, sentences=2)+' (%d)' % len(story), bt))
+                story.append(Paragraph(
+                    'I should never be at the bottom of a frame (%d)' % len(story), h2))
+                story.append(Paragraph(
+                    randomText(theme=PYTHON, sentences=1)+' (%d)' % len(story), bt))
     story.append(Paragraph('The Index which goes at the back', h1))
     story.append(SimpleIndex())
 
@@ -128,10 +135,7 @@ def makeSuite():
     return makeSuiteForClasses(BreakingTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
-    if 'debug' in sys.argv:
-        _test1(None)
-    else:
-        unittest.TextTestRunner().run(makeSuite())
-        printLocation()
+    unittest.TextTestRunner().run(makeSuite())
+    printLocation()

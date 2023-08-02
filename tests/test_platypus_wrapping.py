@@ -1,31 +1,19 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """Tests for context-dependent indentation
 """
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
-import sys, os
-from operator import truth
+__version__ = '3.3.0'
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import unittest
-from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.platypus.paraparser import ParaParser
-from reportlab.platypus.flowables import Flowable
-from reportlab.lib.colors import Color
 from reportlab.lib.units import cm
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
-from reportlab.lib.utils import _className
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.frames import Frame
-from reportlab.platypus.doctemplate \
-     import PageTemplate, BaseDocTemplate, Indenter, FrameBreak, NextPageTemplate
-from reportlab.platypus import tableofcontents
-from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.platypus.tables import TableStyle, Table
-from reportlab.platypus.paragraph import *
-from reportlab.platypus.paragraph import _getFragWords
+from reportlab.platypus.doctemplate import PageTemplate, BaseDocTemplate
 from reportlab.platypus.flowables import Spacer
+
+setOutDir(__name__)
 
 
 def myMainPageFrame(canvas, doc):
@@ -72,31 +60,39 @@ class WrappingTestCase(unittest.TestCase):
         bt = styleSheet['BodyText']
         bt.spaceBefore = 6
 
-        story.append(Paragraph('Test of paragraph wrapping',h1))
+        story.append(Paragraph('Test of paragraph wrapping', h1))
 
-        story.append(Spacer(18,18))
+        story.append(Spacer(18, 18))
 
-        txt = "Normally we wrap paragraphs by looking for spaces between the words.  However, with long technical command references and URLs, sometimes this gives ugly results.  We attempt to split really long words on certain tokens:  slashes, dots etc."
+        txt = ("Normally we wrap paragraphs by looking for spaces between the words. " +
+               " However, with long technical command references and URLs, sometimes " +
+               "this gives ugly results.  We attempt to split really long words on " +
+               "certain tokens:  slashes, dots etc.")
 
-        story.append(Paragraph(txt,bt))
-        
-        story.append(Paragraph('This is an attempt to break long URLs sanely.  Here is a file name: <font face="Courier">C:\\Windows\\System32\\Drivers\\etc\\hosts</font>.  ', bt))
-        
+        story.append(Paragraph(txt, bt))
 
-        story.append(Paragraph('This paragraph has a URL (basically, a word) too long to fit on one line, so it just overflows. http://some-really-long-site.somewhere-verbose.com/webthingies/framework/xc4987236hgsdlkafh/foo?format=dingbats&amp;content=rubbish. Ideally, we would wrap it in the middle.', bt))
+        story.append(Paragraph(
+            'This is an attempt to break long URLs sanely.  Here is a file name: ' +
+            '<font face="Courier">C:\\Windows\\System32\\Drivers\\etc\\hosts</font>.  ',
+            bt))
 
+        story.append(Paragraph(
+            'This paragraph has a URL (basically, a word) too long to fit on one ' +
+            'line, so it just overflows. http://some-really-long-site.somewhere-' +
+            'verbose.com/webthingies/framework/xc4987236hgsdlkafh/foo?format=' +
+            'dingbats&amp;content=rubbish. Ideally, we would wrap it in the middle.'
+            , bt))
 
-        
-        
         doc = MyDocTemplate(outputfile('test_platypus_wrapping.pdf'))
         doc.multiBuild(story)
 
-#noruntests
+
+# noruntests
 def makeSuite():
     return makeSuiteForClasses(WrappingTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

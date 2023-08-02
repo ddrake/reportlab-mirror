@@ -1,31 +1,20 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
 """Tests for context-dependent indentation
 """
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
-import sys, os
-from operator import truth
+__version__ = '3.3.0'
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import unittest
-from reportlab.pdfbase.pdfmetrics import stringWidth
-from reportlab.platypus.paraparser import ParaParser
-from reportlab.platypus.flowables import Flowable
-from reportlab.lib.colors import Color
 from reportlab.lib.units import cm
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
-from reportlab.lib.utils import _className
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.frames import Frame
-from reportlab.platypus.doctemplate \
-     import PageTemplate, BaseDocTemplate, Indenter, FrameBreak, NextPageTemplate
-from reportlab.platypus import tableofcontents
-from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.platypus.tables import TableStyle, Table
-from reportlab.platypus.paragraph import *
-from reportlab.platypus.paragraph import _getFragWords
+from reportlab.platypus.doctemplate import (PageTemplate, BaseDocTemplate)
 from reportlab.platypus.flowables import Spacer, Preformatted
+
+setOutDir(__name__)
+
 
 def myMainPageFrame(canvas, doc):
     "The page frame used for all PDF documents."
@@ -72,25 +61,24 @@ class WrappingTestCase(unittest.TestCase):
         bt.spaceBefore = 6
         normalStyle = styleSheet['Code']
 
+        story.append(Paragraph('Test of preformatted text wrapping', h1))
 
-        story.append(Paragraph('Test of preformatted text wrapping',h1))
-
-        story.append(Spacer(18,18))
+        story.append(Spacer(18, 18))
 
         txt = """Our Preformatted class can be used for printing simple blocks
-of code. It respects whitespace and newlines, and will not normally attempt 
-to wrap your code. However, if your individual lines are too long, this can 
-overflow the width of the column and even run off the page. Three optional 
-attributes - maximumLineLength, splitCharacters and newLineCharacter - 
-can be used to do simple wrapping. maximumLineLength will force the text to
-wrap. Note that this simply counts characters - it takes no account of
-actual width on the page. The examples below wrap lines above a certain length
+ of code. It respects whitespace and newlines, and will not normally attempt
+ to wrap your code. However, if your individual lines are too long, this can
+ overflow the width of the column and even run off the page. Three optional
+ attributes - maximumLineLength, splitCharacters and newLineCharacter -
+ can be used to do simple wrapping. maximumLineLength will force the text to
+ wrap. Note that this simply counts characters - it takes no account of
+ actual width on the page. The examples below wrap lines above a certain length
 and add a '>' to the start of the following line.
 """
 
-        story.append(Paragraph(txt,bt))
-        
-        story.append(Paragraph("",bt))
+        story.append(Paragraph(txt, bt))
+
+        story.append(Paragraph("", bt))
 
         code = """
 #Copyright ReportLab Europe Ltd. 2000-2017
@@ -196,19 +184,21 @@ class XPreformatted(Paragraph):
             return ParaLines(kind=1, lines=lines)
 
         return lines
-"""
-        
-        story.append(Preformatted(code,normalStyle,dedent=0, maxLineLength=60, newLineChars='> '))
+"""  # noqa
+
+        story.append(Preformatted(code, normalStyle, dedent=0, maxLineLength=60,
+                                  newLineChars='> '))
 
         doc = MyDocTemplate(outputfile('test_platypus_preformatted.pdf'))
         doc.multiBuild(story)
 
-#noruntests
+
+# noruntests
 def makeSuite():
     return makeSuiteForClasses(WrappingTestCase)
 
 
-#noruntests
+# noruntests
 if __name__ == "__main__":
     unittest.TextTestRunner().run(makeSuite())
     printLocation()

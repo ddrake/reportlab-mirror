@@ -1,27 +1,31 @@
-#Copyright ReportLab Europe Ltd. 2000-2017
-#see license.txt for license details
-#test_pdfbase_pdfmetrics_widths
+# Copyright ReportLab Europe Ltd. 2000-2017
+# see license.txt for license details
+# test_pdfbase_pdfmetrics_widths
 """
 Various tests for PDF metrics.
 
 The main test prints out a PDF documents enabling checking of widths of every
 glyph in every standard font.  Long!
 """
-__version__='3.3.0'
-from reportlab.lib.testutils import setOutDir,makeSuiteForClasses, outputfile, printLocation
-setOutDir(__name__)
+__version__ = '3.3.0'
+
+from reportlab.lib.testutils import (setOutDir, makeSuiteForClasses, outputfile,
+                                     printLocation)
 import unittest
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase import _fontdata
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib import colors
 
+setOutDir(__name__)
 verbose = 0
-fontNamesToTest = _fontdata.standardFonts #[0:12]  #leaves out Symbol and Dingbats for now
+
+# [0:12]  #leaves out Symbol and Dingbats for now
+fontNamesToTest = _fontdata.standardFonts
 
 
 def decoratePage(c, header):
-    c.setFont('Helvetica-Oblique',10)
+    c.setFont('Helvetica-Oblique', 10)
     c.drawString(72, 800, header)
     c.drawCentredString(297, 54, 'Page %d' % c.getPageNumber())
 
@@ -31,18 +35,19 @@ def makeWidthTestForAllGlyphs(canv, fontName, outlining=1):
     thisFont = pdfmetrics.getFont(fontName)
     encName = thisFont.encName
     canv.setFont('Helvetica-Bold', 12)
-    title = 'Glyph Metrics Test for font %s, ascent=%s, descent=%s, encoding=%s' % (fontName, str(thisFont.face.ascent), str(thisFont.face.descent), encName)
+    title = 'Glyph Metrics Test for font %s, ascent=%s, descent=%s, encoding=%s' % (
+        fontName, str(thisFont.face.ascent), str(thisFont.face.descent), encName)
     canv.drawString(80, 750,  title)
-    canv.setFont('Helvetica-Oblique',10)
+    canv.setFont('Helvetica-Oblique', 10)
     canv.drawCentredString(297, 54, 'Page %d' % canv.getPageNumber())
 
     if outlining:
         # put it in the outline
         canv.bookmarkPage('GlyphWidths:' + fontName)
-        canv.addOutlineEntry(fontName,'GlyphWidths:' + fontName, level=1)
+        canv.addOutlineEntry(fontName, 'GlyphWidths:' + fontName, level=1)
 
     y = 720
-    widths = thisFont.widths
+    # widths = thisFont.widths (assigned but not used)
     glyphNames = thisFont.encoding.vector
     # need to get the right list of names for the font in question
     for i in range(256):
@@ -57,7 +62,8 @@ def makeWidthTestForAllGlyphs(canv, fontName, outlining=1):
 
             try:
                 w = canv.stringWidth(text, fontName, 10)
-                canv.drawString(80, y, '%03d   %s w=%3d' % (i, glyphName, int((w/3.)*10)))
+                canv.drawString(80, y, '%03d   %s w=%3d' % (
+                    i,  glyphName, int((w/3.)*10)))
                 canv.setFont(fontName, 10)
                 canv.drawString(200, y, text)
 
@@ -87,7 +93,7 @@ def makeTestDoc(fontNames):
     c.save()
     if verbose:
         if verbose:
-            print('saved',filename)
+            print('saved', filename)
 
 
 class PDFMetricsTestCase(unittest.TestCase):
@@ -102,8 +108,8 @@ def makeSuite():
     return makeSuiteForClasses(PDFMetricsTestCase)
 
 
-#noruntests
-if __name__=='__main__':
+# noruntests
+if __name__ == '__main__':
     usage = """Usage:
     (1) test_pdfbase_pdfmetrics.py     -  makes doc for all standard fonts
     (2) test_pdfbase_pdfmetrics.py fontname - " " for just one font."""
@@ -112,7 +118,7 @@ if __name__=='__main__':
     # accept font names as arguments; otherwise it does the lot
     if len(sys.argv) > 1:
         for arg in sys.argv[1:]:
-            if not arg in fontNamesToTest:
+            if arg not in fontNamesToTest:
                 print('unknown font %s' % arg)
                 print(usage)
                 sys.exit(0)
