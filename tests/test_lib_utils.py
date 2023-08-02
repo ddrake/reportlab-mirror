@@ -390,5 +390,6 @@ def makeSuite():
 
 
 if __name__ == "__main__":  # noruntests
+    # unittest.TextTestRunner(verbosity=2, tb_locals=True).run(makeSuite())
     unittest.TextTestRunner().run(makeSuite())
     printLocation()
