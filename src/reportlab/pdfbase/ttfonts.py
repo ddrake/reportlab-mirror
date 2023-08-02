@@ -854,16 +854,23 @@ class TTFontFile(TTFontParser):
             last = -1
             for unichar in range(256):
                 if T[unichar] == 0:
+                    glyphidx = SH[0].idRangeOffset+(unichar-SH[0].firstCode)
                     # Special case, single byte encoding entry,
                     # look unichar up in subhead
                     if last != -1:
                         glyph = 0
                     elif (unichar < SH[0].firstCode or
                           unichar >= SH[0].firstCode+SH[0].entryCount or
-                          SH[0].idRangeOffset+(unichar-SH[0].firstCode) >= entryCount):
+                          # SH[0].idRangeOffset+(unichar-SH[0].firstCode)
+                          #   >= entryCount):
+                          # DD: Handle the case when entrycount < 0 so glyphs=[]
+                          # This will fix the index error, but is it correct?
+                          len(glyphs) == 0 or
+                          glyphidx < 0 or
+                          glyphidx >= entryCount):
                         glyph = 0
                     else:
-                        glyph = glyphs[SH[0].idRangeOffset+(unichar-SH[0].firstCode)]
+                        glyph = glyphs[glyphidx]
                         if glyph != 0:
                             glyph += SH[0].idDelta
                     # assume the single byte codes are ascii
@@ -873,10 +880,15 @@ class TTFontFile(TTFontParser):
                 else:
                     k = T[unichar]
                     for j in range(SH[k].entryCount):
-                        if SH[k].idRangeOffset+j >= entryCount:
+                        glyphidx = SH[k].idRangeOffset+j
+                        # DD: similar issue to above
+                        # if SH[k].idRangeOffset+j >= entryCount:
+                        if (len(glyphs) == 0 or
+                                glyphidx < 0 or
+                                glyphidx >= entryCount):
                             glyph = 0
                         else:
-                            glyph = glyphs[SH[k].idRangeOffset+j]
+                            glyph = glyphs[glyphidx]
                             if glyph != 0:
                                 glyph += SH[k].idDelta
                         if glyph != 0 and glyph < self.numGlyphs:
