@@ -8,7 +8,7 @@ __all__ = (
         'text2Path',
         'RenderPMError',
         )
-from reportlab.pdfbase.pdfmetrics import getFont, unicode2T1
+from reportlab.pdfbase.pdfmetrics import getFont, unicode2T1, stringWidth
 from reportlab.lib.utils import open_and_read, isBytes, rl_exec
 from .shapes import _baseGFontName, _PATH_OP_ARG_COUNT, _PATH_OP_NAMES, definePath
 from sys import exc_info
@@ -179,8 +179,7 @@ def __makeTextPathsCode__(tp=None, _TP=('freetype', '_renderPM')):
                         % fontName)
                 P_extend = [].extend
                 if not anchor == 'start':
-                    # bug? Undefined name stringWidth? is it a method?
-                    textLen = stringWidth(text, fontName, fontSize)  # noqa
+                    textLen = stringWidth(text, fontName, fontSize)
                     if anchor == 'end':
                         x = x-textLen
                     elif anchor == 'middle':
