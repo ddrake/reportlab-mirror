@@ -8,6 +8,7 @@ import functools
 from configparser import ConfigParser
 import unittest
 from reportlab.lib.utils import isCompactDistro, __rl_loader__, rl_isdir, asUnicode
+from reportlab.lib.rltempfile import get_rl_tempdir
 
 import reportlab
 reportlab._rl_testing = True
@@ -80,8 +81,7 @@ def setOutDir(name):
         _OUTDIR = scriptDir
 
     if not isWritable(_OUTDIR):
-        # bug? undefined name get_rl_tempdir
-        _OUTDIR = get_rl_tempdir('reportlab_test')  # noqa
+        _OUTDIR = get_rl_tempdir('reportlab_test')
 
     import reportlab
     RL_HOME = reportlab.__path__[0]
