@@ -14,6 +14,7 @@ of the algorithm.
 __version__ = '3.3.0'
 
 import re
+import functools
 from unicodedata import category
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.rl_config import _FUZZ
@@ -241,8 +242,9 @@ rx = re.compile("([\u2e80-\uffff])", re.UNICODE)
 
 
 def cjkwrap(text, width, encoding="utf8"):
-    # bug? undefined name reduce
-    return reduce(lambda line, word, width=width: '%s%s%s' % (  # noqa
+    # TODO: the link above gives better solutions for this, but they will require
+    # some testing...
+    return functools.sreduce(lambda line, word, width=width: '%s%s%s' % (
         line,
         [' ', '\n', ''][(len(line)-line.rfind('\n')-1 +
                          len(word.split('\n', 1)[0]) >= width) or
