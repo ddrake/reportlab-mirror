@@ -70,7 +70,7 @@ if 'fp_str' in _py_funcs:
 
     # hack test for comma users
     if ',' in fp_str(0.25):
-        # bug? undefined name _fp_str
+        # _fb_str is imported via the exec call above.  Don't like this!
         _FP_STR = _fp_str  # noqa
 
         def _fp_str(*a):
