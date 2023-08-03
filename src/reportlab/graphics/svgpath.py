@@ -419,6 +419,8 @@ class SvgPath(Path, UserNode):
 
             else:
                 # bug? undefined name logger
+                # lib/logger doesn't have debug method
+                # was import of python logging module intended?
                 logger.debug("Suspicious self operator: %s", op) # noqa
 
             if op not in ('Q', 'q', 'T', 't'):
