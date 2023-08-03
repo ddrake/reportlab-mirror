@@ -1261,11 +1261,11 @@ def escapeTextOnce(text):
 
 
 def fileName2FSEnc(fn):
+    from reportlab.rl_config import fsEncodings
     if isUnicode(fn):
         return fn
     else:
-        # bug? undefined name fsEncodings
-        for enc in fsEncodings:  # noqa
+        for enc in fsEncodings:
             try:
                 return fn.decode(enc)
             except Exception:
