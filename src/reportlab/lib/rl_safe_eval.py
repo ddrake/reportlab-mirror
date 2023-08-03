@@ -18,7 +18,7 @@ eval_debug = int(os.environ.get('EVAL_DEBUG', '0'))
 strTypes = (bytes, str)
 isPy39 = sys.version_info[:2] >= (3, 9)
 
-haveNameConstant = hasattr(ast, 'NameConstant')
+hasNameConstant = hasattr(ast, 'NameConstant')
 
 
 class BadCode(ValueError):
@@ -276,8 +276,7 @@ class UntrustedAstTransformer(ast.NodeTransformer):
         return (tmp_target, cleanup)
 
     def gen_none_node(self):
-        # bug? undefined name hasNameConstant
-        return (ast.NameConstant(value=None) if hasNameConstant else  # noqa
+        return (ast.NameConstant(value=None) if hasNameConstant else
                 ast.Name(id='None', ctx=ast.Load()))
 
     def gen_lambda(self, args, body):
