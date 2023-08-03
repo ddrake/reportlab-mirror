@@ -16,7 +16,7 @@ Execute the script to see some test drawings."""
 from reportlab.graphics.shapes import numericXShift, EmptyClipPath
 from reportlab.graphics.renderbase import (getStateDelta, renderScaledDrawing,
                                            Renderer)
-from reportlab.pdfbase.pdfmetrics import getFont, unicode2T1
+from reportlab.pdfbase.pdfmetrics import getFont, unicode2T1, stringWidth
 from reportlab.lib.utils import isUnicode
 from reportlab import rl_config
 from .utils import setFont as _setFont, RenderPMError
@@ -221,8 +221,7 @@ class _PMRenderer(Renderer):
             x = stringObj.x
             y = stringObj.y
             if text_anchor not in ['start', 'inherited']:
-                # bug? missing an impoert? stringWidth is not defined.
-                textLen = stringWidth(text, fontName, fontSize)  # noqa
+                textLen = stringWidth(text, fontName, fontSize)
                 if text_anchor == 'end':
                     x -= textLen
                 elif text_anchor == 'middle':
@@ -579,8 +578,7 @@ class PMCanvas:
 
         try:
             if text_anchor in ('end', 'middle', 'end'):
-                # bug? missing an impoert? stringWidth is not defined.
-                textLen = stringWidth(text, fontName, fontSize)  # noqa
+                textLen = stringWidth(text, fontName, fontSize)
                 if text_anchor == 'end':
                     x -= textLen
                 elif text_anchor == 'middle':
