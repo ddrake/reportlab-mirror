@@ -1805,11 +1805,12 @@ class Canvas(_PDFColorSetter):
         fontnames = self._doc.getAvailableFonts()
         return fontnames
 
-    def listLoadedFonts0(self):
-        "Convenience function to list all loaded fonts"
-        names = list(pdfmetrics.widths.keys())
-        names.sort()
-        return names
+    # def listLoadedFonts0(self):
+    #     "Convenience function to list all loaded fonts"
+    #     # bug: reportlab.pdfbase.pdfmetrics has no attribute 'widths'
+    #     names = list(pdfmetrics.widths.keys())
+    #     names.sort()
+    #     return names
 
     def setFont(self, psfontname, size, leading=None):
         """Sets the font.  If leading not specified, defaults to 1.2 x
