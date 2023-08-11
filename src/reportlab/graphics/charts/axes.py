@@ -1383,8 +1383,8 @@ class ValueAxis(_AxisG):
                 try:
                     v = T[2]
                 except IndexError:
-                    # bug?  undefined name bubbleMax
-                    v = bubbleMAx*0.1  # noqa
+                    # v = bubbleMAx*0.1 (fix typo)
+                    v = bubbleMax*0.1
                 bubbleV *= (v/bubbleMax)**0.5
                 return func(T[x]+bubbleV, T[x]-bubbleV)
             if oMin is None:
