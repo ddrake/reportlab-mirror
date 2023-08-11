@@ -345,8 +345,9 @@ If used defaults are
             if vAdgl:
                 vA.makeGrid(g, parent=self, dim=cA.getGridDims)
             for a in getattr(self, 'annotations', ()):
-                # bug? undefined name ag
-                ag.add(a(self, cA.scale, vA.scale))  # noqa
+                # bug? undefined name ag! I think a typo (g intended)
+                # ag.add(a(self, cA.scale, vA.scale))  # noqa
+                g.add(a(self, cA.scale, vA.scale))
         else:
             Z = dict(
                 background=0,
