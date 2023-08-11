@@ -1,4 +1,4 @@
-from reportlab.lib.colors import _PCMYK_black
+from reportlab.lib.colors import _PCMYK_black, Color
 from reportlab.graphics.charts.textlabels import Label
 from reportlab.graphics.shapes import Circle, Drawing, Group, Line, Rect, String
 from reportlab.graphics.widgetbase import Widget
@@ -67,10 +67,9 @@ class DotBox(Widget):
         self.labelOffset = 5
         self.strokeWidth = 0.5
         self.gridDivWidth = 0.5*cm
-        # bug? missing import? undefined name colors
-        self.gridColor = colors.Color(25/255.0, 77/255.0, 135/255.0)  # noqa
+        self.gridColor = Color(25/255.0, 77/255.0, 135/255.0)
         self.dotDiameter = 0.4*cm
-        self.dotColor = colors.Color(232/255.0, 224/255.0, 119/255.0)  # noqa
+        self.dotColor = Color(232/255.0, 224/255.0, 119/255.0)
         self.dotXPosition = 1
         self.dotYPosition = 1
         self.x = 30
