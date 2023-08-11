@@ -89,7 +89,8 @@ class _PCT(float):
 
     def normalizedValue(self, normalizer):
         if not normalizer:
-            normaliser = self._normalizer  # noqa
+            # normaliser = self._normalizer  (fixed typo)
+            normalizer = self._normalizer
         r = _PCT(normalizer*self._value)
         r._value = self._value
         r._normalizer = normalizer
@@ -98,8 +99,9 @@ class _PCT(float):
     def __copy__(self):
         r = _PCT(float(self))
         r._value = self._value
-        # bug? undefined name normalizer
-        r._normalizer = normalizer  # noqa
+        # bug? undefined name normalizer.  Assume self._normalizer intended.
+        # r._normalizer = normalizer
+        r._normalizer = self._normalizer
         return r
 
     def __deepcopy__(self, mem):
