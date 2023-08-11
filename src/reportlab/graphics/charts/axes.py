@@ -348,8 +348,8 @@ class _AxisG(Widget):
         if not hasattr(self, '_tickValues'):
             self._pseudo_configure()
         if exclude:
-            exf = (self.isYAxis and (lambda l: l.y1 in exclude) or  # noqa
-                   (lambda l: l.x1 in exclude))  # noqa
+            exf = (self.isYAxis and (lambda line: line.y1 in exclude) or
+                   (lambda line: line.x1 in exclude))
         else:
             exf = None
         for t in self._tickValues:
@@ -2313,7 +2313,9 @@ class TimeValueAxis:
                     fv = [(v - int(v))*fm for v in tv]
                     if _allInt(fv):
                         s1 = 'h' if u == self._dc else ('m' if u == self._mc else 's')
-                        # bug? ...%s.. has one placeholder but two susbstitutions
+                        # Flake complains 'one placeholder but two substitutions'
+                        # but it's OK -- not all substitutions are made in one step.
+                        # TODO: is it possible to do this more simply?
                         def fmt(x, uf=uf, fm=fm, fmt='%%d%s%%d%%s' % (s, s1)):  # noqa
                             return fmt % (int(x/uf), int((x/uf - int(x/uf))*fm))  # noqa
                     else:
