@@ -2008,12 +2008,14 @@ class Table(Flowable):
                             newStyle.valign = "TOP"
                         else:
                             # Adjust the margins to push it towards the true middle
-                            # bug? undefined name v!
-                            h = self._listCellGeom(v[0] or v[1], width, oldStyle)[1]  # noqa
+                            # undefined name v!  I think res was intended.
+                            # h = self._listCellGeom(v[0] or v[1], width, oldStyle)[1]
+                            h = self._listCellGeom(res[0] or res[1], width, oldStyle)[1]
                             margin = (curRowHeight - h) / 2
-                            if v[0]:  # noqa: F821
+                            # if v[0]:
+                            if res[0]:
                                 oldStyle.topPadding += margin
-                            elif v[1]:  # noqa: F821
+                            elif res[1]:
                                 newStyle.bottomPadding += margin
                     newCellStyles[n][span_sc] = newStyle
 
