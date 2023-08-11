@@ -898,8 +898,9 @@ class BaseDocTemplate:
         self.handle_frameEnd(resume)
 
     def handle_breakBefore(self, flowables):
-        '''preprocessing step to allow pageBreakBefore and
-        frameBreakBefore attributes'''
+        '''Preprocessing step to allow pageBreakBefore and
+        frameBreakBefore attributes.  This has side affect of maybe
+        inserting FrameBreak.'''
         first = flowables[0]
         # if we insert a page break before, we'll process that, see it again,
         # and go in an infinite loop.  So we need to set a flag on the object
@@ -907,8 +908,8 @@ class BaseDocTemplate:
         if hasattr(first, '_skipMeNextTime'):
             delattr(first, '_skipMeNextTime')
             return
-        # this could all be made much quicker by putting the attributes
-        # in to the flowables with a defult value of 0
+        # TODO: this could all be made much quicker by putting the attributes
+        # in to the flowables with a defult value of 0 (or False? - dd)
         if hasattr(first, 'pageBreakBefore') and first.pageBreakBefore == 1:
             first._skipMeNextTime = 1
             first.insert(0, PageBreak())
@@ -929,7 +930,8 @@ class BaseDocTemplate:
             return
 
     def handle_keepWithNext(self, flowables):
-        "implements keepWithNext"
+        """Implements keepWithNext with side effect of maybe inserting
+        a KeepTogetherClass"""
         i = 0
         n = len(flowables)
         while i < n and flowables[i].getKeepWithNext() and _ktAllow(flowables[i]):
@@ -962,7 +964,8 @@ class BaseDocTemplate:
                 del f._frame
 
     def handle_flowable(self, flowables):
-        '''try to handle one flowable from the front of list flowables.'''
+        '''Try to handle one flowable from the front of list flowables.
+        Side affect: modifies flowables list'''
 
         # allow document a chance to look at, modify or ignore
         # the object(s) about to be processed
@@ -1128,8 +1131,9 @@ class BaseDocTemplate:
            doing translations, scalings and redefining the page break
            operations).
         """
-        # assert filter(lambda x: not isinstance(x,Flowable), flowables)==[], \
-        # "flowables argument error"
+        # TODO: the flowables list implements a stack, but backwards (issue #6) - DD
+        assert all((isinstance(x, Flowable) for x in flowables)), (
+            "flowables argument error")
         flowableCount = len(flowables)
         if self._onProgress:
             self._onProgress('STARTED', 0)
