@@ -1077,12 +1077,12 @@ def _renderPath(path, drawFuncs, countOnly=False, forceClose=False):
     i = 0
     hadClosePath = 0
     hadMoveTo = 0
+    pop = _MOVETO  # safe initial value for pop (prev op)
     active = not countOnly
     for op in path.operators:
         if op == _MOVETO:
             if forceClose:
-                # bug? undefined name pop!
-                if hadMoveTo and pop != _CLOSEPATH:  # noqa
+                if hadMoveTo and pop != _CLOSEPATH:
                     hadClosePath += 1
                     if active:
                         drawFuncs[_CLOSEPATH]()
