@@ -1582,11 +1582,11 @@ def splitLines0(frags, widths):
     i = -1
     ll = len(frags)
     lim = start = 0
+    text = None  # will be set before it's used
     while 1:
         # find a non whitespace character
         while i < ll:
-            # bug? local variable text referenced before assignment!
-            while start < lim and text[start] == ' ':  # noqa
+            while start < lim and text[start] == ' ':
                 start += 1
             if start == lim:
                 i += 1
@@ -3089,8 +3089,9 @@ if __name__ == '__main__':    # NORUNTESTS
             print()
             ll += 1
 
-    def dumpProcessedFrags(P, label='processed_frags'):
-        # bug? P2 is not defined -- was P intended?
+    # def dumpProcessedFrags(P, label='processed_frags'):
+    # I think the argument should be P2 (the second element of the pair from split
+    def dumpProcessedFrags(P2, label='processed_frags'):
         if isinstance(P2.frags[0], list):  # noqa
             _F = {}
             _S = [].append
