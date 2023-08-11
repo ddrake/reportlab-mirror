@@ -73,19 +73,20 @@ class Flowable:
        base API to provide a translate() function.
 
     """
+    # DD: If these are used as booleans, why not make them booleans?
     _fixedWidth = 0         # assume wrap results depend on arguments?
     _fixedHeight = 0
 
     def __init__(self):
         self.width = 0
         self.height = 0
-        self.wrapped = 0
+        self.wrapped = 0  # What is the purpose? -- not used here.
 
         # these are hints to packers/frames as to how the floable should be positioned
         self.hAlign = 'LEFT'    # CENTER/CENTRE or RIGHT
         self.vAlign = 'BOTTOM'  # MIDDLE or TOP
 
-        # optional holder for trace info
+        # optional holder for a TraceInfo instance (used in doctemplate)
         self._traceInfo = None
         self._showBoundary = None
 
@@ -101,6 +102,7 @@ class Flowable:
         del self.canv
 
     def _hAlignAdjust(self, x, sW=0):
+        # hasattr always true for this class, but subclasses don't call our constructor.
         if sW and hasattr(self, 'hAlign'):
             a = self.hAlign
             if a in ('CENTER', 'CENTRE', TA_CENTER):
@@ -117,6 +119,7 @@ class Flowable:
         canvas.saveState()
         canvas.translate(x, y)
         self._drawOn(canvas)
+        # hasattr always true for this class, but subclasses don't call our constructor.
         if hasattr(self, '_showBoundary') and self._showBoundary:
             # diagnostic tool support
             canvas.setStrokeColor(gray)
