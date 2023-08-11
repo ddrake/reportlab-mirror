@@ -532,7 +532,8 @@ class PSCanvas:
             op = part[0]
             args = list(part[1:])
 
-            # bug? figureLine not defined
+            # Can't see where figureLine, figureArc and figureCurve are defined,
+            # but these functions are passed here via partlist.
             if op == figureLine:  # noqa
                 if first:
                     first = 0
@@ -541,13 +542,11 @@ class PSCanvas:
                     a("%s l" % fp_str(args[:2]))
                 a("%s l" % fp_str(args[2:]))
 
-            # bug? figureArc not defined
             elif op == figureArc:  # noqa
                 first = 0
                 x1, y1, x2, y2, startAngle, extent = args[:6]
                 a(self._genArcCode(x1, y1, x2, y2, startAngle, extent))
 
-            # bug? figureCurve not defined
             elif op == figureCurve:  # noqa
                 if first:
                     first = 0
