@@ -2046,7 +2046,6 @@ class Canvas(_PDFColorSetter):
         del self._doc.Catalog.ViewerPreferences[pref]
 
     def setCatalogEntry(self, key, value):
-        from reportlab.pdfbase.pdfdoc import PDFDictionary, PDFArray, PDFString
         if isStr(value):
             value = PDFString(value)
         elif isinstance(value, (list, tuple)):
