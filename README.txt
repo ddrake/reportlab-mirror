@@ -106,14 +106,12 @@ The latest documentation is available at https://docs.reportlab.com/
 For over 20 years we generated our own manuals using the library.
 In a 'built' distribution, they may already be present in the
 docs/ directory.  If not, execute ``python genAll.py`` in
-that directory, and it will create three PDF manuals::
+that directory, and it will create a PDF manual::
 
     reportlab-userguide.pdf
-    reportlab-reference.pdf
-    reportlab-graphics-reference.pdf
 
-These are also available in daily build form from the documentation
-page on our web site. The manuals are very useful 'how-to' examples
+This is also available in daily build form from the documentation
+page on our web site. The manual has very useful 'how-to' examples
 if you are aiming to create long documents.  However, they will gradually
 become out of date.
 
