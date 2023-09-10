@@ -5,9 +5,9 @@ __doc__ = """The Reportlab PDF generation library."""
 import sys
 import os
 
-Version = "4.0.4"
+Version = "4.0.5"
 __version__ = Version
-__date__ = '20230601'
+__date__ = '20230829'
 
 __min_python_version__ = (3, 7)
 if sys.version_info < __min_python_version__:
