@@ -966,6 +966,7 @@ class BaseDocTemplate:
     def handle_flowable(self, flowables):
         '''Try to handle one flowable from the front of list flowables.
         Side affect: modifies flowables list'''
+        from reportlab.platypus import Spacer
 
         # allow document a chance to look at, modify or ignore
         # the object(s) about to be processed
@@ -1028,6 +1029,11 @@ class BaseDocTemplate:
                         flowables[0:0] = S  # put split flowables back on the list
                 else:
                     if hasattr(f, '_postponed'):
+                        # hack by Dow: if it's just a spacer, don't throw,
+                        # just essentially remove it from the flowables list.
+                        if isinstance(f, Spacer):
+                            self.handle_frameEnd()
+                            return
                         ident = ('''Flowable %s%s too large on page %d in frame
                                     %r%s of template %r''' %
                                  (self._fIdent(f, 60, frame), _fSizeString(f),
