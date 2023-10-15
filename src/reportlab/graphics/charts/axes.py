@@ -52,7 +52,7 @@ from reportlab.lib.utils import isSeq
 
 
 # Helpers.
-def _findMinMaxValue(V, x, default, func, special=None):
+def _findMinMaxValue(V, x, default, func, special=None, extraMinMaxValues=None):
     if isSeq(V[0][0]):
         if special:
             def f(T, x=x, special=special, func=func):
@@ -64,17 +64,19 @@ def _findMinMaxValue(V, x, default, func, special=None):
     V = list(filter(len, [[x for x in x if x is not None] for x in V]))
     if len(V) == 0:
         return default
-    return func(list(map(func, V)))
+    r = func(list(map(func, V)))
+    return func(func(extraMinMaxValues), r) if extraMinMaxValues else r
 
 
-def _findMin(V, x, default, special=None):
+def _findMin(V, x, default, special=None, extraMinMaxValues=None):
     '''find minimum over V[i][x]'''
     return _findMinMaxValue(V, x, default, min, special=special)
 
 
-def _findMax(V, x, default, special=None):
+def _findMax(V, x, default, special=None, extraMinMaxValues=None):
     '''find maximum over V[i][x]'''
-    return _findMinMaxValue(V, x, default, max, special=special)
+    return _findMinMaxValue(V, x, default, max, special=special,
+                            extraMinMaxValues=extraMinMaxValues)
 
 
 def _allInt(values):
@@ -1184,6 +1186,8 @@ class ValueAxis(_AxisG):
             isNumberOrNone, desc='Minimum required value range.'),
         innerTickDraw=AttrMapValue(
             isNoneOrCallable, desc="Callable to replace _drawInnerTicks"),
+        extraMinMaxValues=AttrMapValue(
+            isListOfNumbersOrNone, desc='extra values to use in min max calculation'),
         )
 
     def __init__(self, **kw):
@@ -1271,6 +1275,7 @@ class ValueAxis(_AxisG):
             loLLen=0,
             hiLLen=0,
             requiredRange=0,
+            extraMinMaxValues=None,
             )
         self.labels.angle = 0
 
@@ -1343,9 +1348,11 @@ class ValueAxis(_AxisG):
         oMin = valueMin = self.valueMin
         oMax = valueMax = self.valueMax
         if valueMin is None:
-            valueMin = self._cValueMin = _findMin(dataSeries, self._dataIndex, 0)
+            valueMin = self._cValueMin = _findMin(
+                dataSeries, self._dataIndex, 0, self.extraMinMaxValues)
         if valueMax is None:
-            valueMax = self._cValueMax = _findMax(dataSeries, self._dataIndex, 0)
+            valueMax = self._cValueMax = _findMax(
+                dataSeries, self._dataIndex, 0, self.extraMinMaxValues)
         if valueMin == valueMax:
             if valueMax == 0:
                 if oMin is None and oMax is None:
@@ -1388,11 +1395,13 @@ class ValueAxis(_AxisG):
                 bubbleV *= (v/bubbleMax)**0.5
                 return func(T[x]+bubbleV, T[x]-bubbleV)
             if oMin is None:
-                valueMin = self._cValueMin = _findMin(dataSeries, self._dataIndex, 0,
-                                                      special=special)
+                valueMin = self._cValueMin = _findMin(
+                    dataSeries, self._dataIndex, 0, special=special,
+                    extraMinMaxValues=self.extraMinMaxValues)
             if oMax is None:
-                valueMax = self._cValueMax = _findMax(dataSeries, self._dataIndex, 0,
-                                                      special=special)
+                valueMax = self._cValueMax = _findMax(
+                    dataSeries, self._dataIndex, 0, special=special,
+                    extraMinMaxValues=self.extraMinMaxValues)
 
         valueMin, valueMax = self._preRangeAdjust(valueMin, valueMax)
 
@@ -2447,8 +2456,10 @@ class LogValueAxis(ValueAxis):
     def _setRange(self, dataSeries):
         valueMin = self.valueMin
         valueMax = self.valueMax
-        aMin = _findMin(dataSeries, self._dataIndex, 0)
-        aMax = _findMax(dataSeries, self._dataIndex, 0)
+        aMin = _findMin(dataSeries, self._dataIndex, 0,
+                        extraMinMaxValues=self.extraMinMaxValues)
+        aMax = _findMax(dataSeries, self._dataIndex, 0,
+                        extraMinMaxValues=self.extraMinMaxValues)
         if valueMin is None:
             valueMin = aMin
         if valueMax is None:
@@ -2460,7 +2471,7 @@ class LogValueAxis(ValueAxis):
                 (self.__class__.__name__valueMin, valueMax))
         if valueMin <= 0:
             raise ValueError('%s: valueMin=%r negative values are not allowed!'
-                             % valueMin)
+                             % (self.__class__.__name__, valueMin))
         abS = self.avoidBoundSpace
         if abS:
             lMin = math_log10(aMin)
